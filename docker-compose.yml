@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL 16 with pgvector & Row-Level Security
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: copilot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-copilot_app_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-copilot_dev_password_123}
+      POSTGRES_DB: ${DB_NAME:-enterprise_copilot}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/api/src/common/database/migrations/001_initial_schema_and_rls.sql:/docker-entrypoint-initdb.d/001_initial_schema_and_rls.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-copilot_app_user} -d ${DB_NAME:-enterprise_copilot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - copilot-net
+
+  # ----------------------------------------------------------------------------
+  # 2. Redis for BullMQ Ingestion Queue & Rate Limiting
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: copilot-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - copilot-net
+
+  # ----------------------------------------------------------------------------
+  # 3. Backend API (NestJS Modular Monolith)
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: copilot-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${DB_USER:-copilot_app_user}:${DB_PASSWORD:-copilot_dev_password_123}@postgres:5432/${DB_NAME:-enterprise_copilot}?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: info
+      CORS_ORIGIN: "http://localhost:3001"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - copilot-net
+
+  # ----------------------------------------------------------------------------
+  # 4. Frontend Web (Next.js 15 Standalone)
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: copilot-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      - api
+    networks:
+      - copilot-net
+
+networks:
+  copilot-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
