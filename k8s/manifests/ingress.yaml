@@ -1,0 +1,71 @@
+# ==============================================================================
+# Ingress & BackendConfig: High-Availability HTTPS Ingress with SSE Support
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. BackendConfig for API: Extends HTTP Timeout for Long-Lived SSE Streams
+# ------------------------------------------------------------------------------
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: copilot-api-backendconfig
+  namespace: default
+spec:
+  timeoutSec: 3600 # Extended for long-lived Server-Sent Events (SSE) connections
+  connectionDraining:
+    drainingTimeoutSec: 60
+  securityPolicy:
+    name: "copilot-cloud-armor-policy" # Integrates with GCP Cloud Armor WAF
+  logging:
+    enable: true
+    sampleRate: 1.0
+
+---
+# ------------------------------------------------------------------------------
+# 2. Managed SSL/TLS Certificate (Google-Managed Certificate)
+# ------------------------------------------------------------------------------
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: copilot-managed-cert
+  namespace: default
+spec:
+  domains:
+    - copilot.enterprise.internal
+    - copilot.corp.example.com
+
+---
+# ------------------------------------------------------------------------------
+# 3. HTTPS Ingress with Path-Based Routing & TLS Termination
+# ------------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: copilot-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "false" # Strict HTTPS redirect
+    networking.gke.io/managed-certificates: "copilot-managed-cert"
+    beta.cloud.google.com/backend-config: '{"default": "copilot-api-backendconfig"}'
+spec:
+  rules:
+    - host: copilot.enterprise.internal
+      http:
+        paths:
+          # API & Streaming RAG Routes
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: copilot-api-svc
+                port:
+                  number: 3000
+          # Frontend Next.js Web Routes
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: copilot-web-svc
+                port:
+                  number: 3000

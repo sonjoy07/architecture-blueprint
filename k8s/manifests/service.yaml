@@ -1,0 +1,39 @@
+# ==============================================================================
+# Kubernetes Services: API & Web (ClusterIP)
+# ==============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: copilot-api-svc
+  namespace: default
+  labels:
+    app.kubernetes.io/name: copilot-api
+    app.kubernetes.io/component: backend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: copilot-api
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: copilot-web-svc
+  namespace: default
+  labels:
+    app.kubernetes.io/name: copilot-web
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: copilot-web
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
