@@ -1,5 +1,5 @@
-import { DocumentDashboard } from '../../../components/documents/document-dashboard';
+import { DocumentUploader } from '../../../components/ingestion/DocumentUploader';
 
 export default function DocumentsPage() {
-  return <DocumentDashboard />;
+  return <DocumentUploader />;
 }
