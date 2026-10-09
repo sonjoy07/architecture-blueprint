@@ -1,5 +1,5 @@
-import { ChatInterface } from '../../../components/copilot/chat-interface';
+import { CopilotChat } from '../../../components/chat/CopilotChat';
 
 export default function CopilotPage() {
-  return <ChatInterface />;
+  return <CopilotChat />;
 }
