@@ -75,10 +75,10 @@ export const users = pgTable(
     role: userRoleEnum('role').default('MEMBER').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('uq_users_tenant_email').on(table.tenantId, table.email),
-    index('idx_users_tenant_id').on(table.tenantId),
-  ],
+  (table) => ({
+    uqUsersTenantEmail: uniqueIndex('uq_users_tenant_email').on(table.tenantId, table.email),
+    idxUsersTenantId: index('idx_users_tenant_id').on(table.tenantId),
+  }),
 );
 
 export const documents = pgTable(
@@ -94,9 +94,9 @@ export const documents = pgTable(
     piiScrubbed: boolean('pii_scrubbed').default(false).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
-    index('idx_documents_tenant_status').on(table.tenantId, table.status),
-  ],
+  (table) => ({
+    idxDocumentsTenantStatus: index('idx_documents_tenant_status').on(table.tenantId, table.status),
+  }),
 );
 
 export const documentChunks = pgTable(
@@ -115,10 +115,10 @@ export const documentChunks = pgTable(
     metadata: jsonb('metadata').default({}).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex('uq_document_chunk_order').on(table.documentId, table.chunkIndex),
-    index('idx_document_chunks_tenant_doc').on(table.tenantId, table.documentId),
-  ],
+  (table) => ({
+    uqDocumentChunkOrder: uniqueIndex('uq_document_chunk_order').on(table.documentId, table.chunkIndex),
+    idxDocumentChunksTenantDoc: index('idx_document_chunks_tenant_doc').on(table.tenantId, table.documentId),
+  }),
 );
 
 export const auditLogs = pgTable(
@@ -134,9 +134,9 @@ export const auditLogs = pgTable(
     ipAddress: inet('ip_address'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
-    index('idx_audit_logs_tenant_created').on(table.tenantId, table.createdAt),
-  ],
+  (table) => ({
+    idxAuditLogsTenantCreated: index('idx_audit_logs_tenant_created').on(table.tenantId, table.createdAt),
+  }),
 );
 
 // ----------------------------------------------------------------------------

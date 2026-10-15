@@ -32,8 +32,9 @@ export class TokenBudgetService implements OnModuleInit {
       this.logger.log('Tiktoken (cl100k_base) tokenizer initialized successfully.');
     } catch {
       try {
+        // @ts-ignore
         const nativeTiktoken = await import('tiktoken');
-        this.encoder = nativeTiktoken.get_encoding('cl100k_base');
+        this.encoder = (nativeTiktoken as any).get_encoding('cl100k_base');
         this.logger.log('Native tiktoken (cl100k_base) initialized.');
       } catch (err) {
         this.logger.warn('Tiktoken library not installed or failed to load. Using calibrated BPE fallback.');
