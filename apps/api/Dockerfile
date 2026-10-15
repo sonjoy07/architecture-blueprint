@@ -16,7 +16,7 @@ WORKDIR /app
 # ------------------------------------------------------------------------------
 FROM base AS dependencies
 COPY package*.json ./
-RUN npm ci --include=dev
+RUN if [ -f package-lock.json ]; then npm ci --include=dev; else npm install --include=dev; fi
 
 # ------------------------------------------------------------------------------
 # Stage 3: TypeScript Compilation & Asset Bundling
@@ -31,7 +31,7 @@ RUN npm run build
 # ------------------------------------------------------------------------------
 FROM base AS prod-dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi && npm cache clean --force
 
 # ------------------------------------------------------------------------------
 # Stage 5: Hardened Minimal Production Runner
