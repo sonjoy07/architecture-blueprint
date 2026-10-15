@@ -59,8 +59,7 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${DB_USER:-copilot_app_user}:${DB_PASSWORD:-copilot_dev_password_123}@postgres:5432/${DB_NAME:-enterprise_copilot}?sslmode=disable
       REDIS_URL: redis://redis:6379
-      LOG_LEVEL: info
-      CORS_ORIGIN: "http://localhost:3001"
+      CORS_ORIGIN: ${CORS_ORIGIN:-"https://copilot.techsolutionltd.shop,http://localhost:3001"}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     ports:
@@ -85,7 +84,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://copilot.techsolutionltd.shop}
     ports:
       - "3001:3000"
     depends_on:
