@@ -113,7 +113,7 @@ export function Header() {
                 <span>Audited Cryptographic Isolation</span>
               </div>
               <p className="text-slate-300 text-[10px]">
-                Data partition mathematically enforced at database kernel level. Single-tenant session locks guarantee zero cross-organization leakage under SOC 2 Type II controls.
+                Data partition mathematically enforced at database kernel level. Cryptographic workspace session locks guarantee zero cross-organization leakage under SOC 2 Type II controls.
               </p>
               <div className="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between font-mono text-[9px] text-slate-400">
                 <span>Encryption: AES-256 (CMEK)</span>

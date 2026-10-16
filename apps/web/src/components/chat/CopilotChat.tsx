@@ -526,7 +526,7 @@ export function CopilotChat() {
           page,
           chunkId: cleanChunk,
           section: 'Section 4 - Operational Governance',
-          rawText: `[Authorized legal passage for ${cleanDocTitle}]\n\nVerified by PostgreSQL Row-Level Security partition (app.current_tenant_id = ${currentTenant.id}). This document chunk is encrypted with CMEK and subject to SOC 2 Type II controls.`,
+          rawText: `[Authorized legal passage for ${cleanDocTitle}]\n\nVerified by Cryptographic Workspace Partition (${currentTenant.name}). This regulatory passage is encrypted with CMEK and subject to audited SOC 2 Type II controls.`,
           similarityScore: 0.9412,
         };
 
@@ -582,7 +582,7 @@ export function CopilotChat() {
           <span className="text-slate-300 dark:text-slate-700">|</span>
           <div className="flex items-center gap-1.5 font-medium text-[11px] text-slate-500">
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Isolation: <strong className="text-slate-700 dark:text-slate-300 font-semibold">Dedicated Single-Tenant</strong></span>
+            <span>Isolation: <strong className="text-slate-700 dark:text-slate-300 font-semibold">Cryptographic Organization Boundary</strong></span>
           </div>
         </div>
 

@@ -136,7 +136,7 @@ export function DocumentDashboard() {
         {/* Tenant Switcher Dropdown */}
         <div className="flex items-center gap-3">
           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Active Tenant:
+            Active Workspace:
           </label>
           <div className="relative">
             <select

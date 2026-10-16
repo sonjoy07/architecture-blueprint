@@ -398,7 +398,7 @@ export function DocumentUploader() {
             </span>
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Automated zero-egress PII sanitization, dual sparse-dense vector indexing, and isolated single-tenant cryptographic vault storage.
+            Automated zero-egress PII sanitization, dual sparse-dense vector indexing, and isolated cryptographic workspace vault storage.
           </p>
         </div>
 
@@ -487,7 +487,7 @@ export function DocumentUploader() {
               { num: 1, title: 'Step 1: Uploading', desc: 'Secure payload stream' },
               { num: 2, title: 'Step 2: Perimeter DLP', desc: 'Zero-egress PII sanitization' },
               { num: 3, title: 'Step 3: Neural Indexing', desc: 'Multi-modal dense embeddings' },
-              { num: 4, title: 'Step 4: Vault Encryption', desc: 'Dedicated single-tenant partition' },
+              { num: 4, title: 'Step 4: Vault Encryption', desc: 'Dedicated organization partition' },
             ].map((step) => {
               const isDone = activeUpload.step > step.num;
               const isCurrent = activeUpload.step === step.num;
@@ -557,7 +557,7 @@ export function DocumentUploader() {
           <div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              Tenant PII Sanitization Metrics
+              Perimeter PII Sanitization & DLP Metrics
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Live telemetry aggregated across {tenantDocs.length} active documents in{' '}
@@ -664,7 +664,7 @@ export function DocumentUploader() {
               {filteredDocs.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-slate-400">
-                    No matching compliance documents found in this tenant partition.
+                    No matching compliance documents found in this workspace partition.
                   </td>
                 </tr>
               ) : (
@@ -753,7 +753,7 @@ export function DocumentUploader() {
               <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Document</span>
                 <span className="font-semibold text-slate-900 dark:text-slate-100 block mt-0.5">{selectedAuditDoc.title}</span>
-                <span className="font-mono text-[10px] text-slate-500 block mt-1">Tenant ID: {selectedAuditDoc.tenantId}</span>
+                <span className="font-mono text-[10px] text-slate-500 block mt-1">Workspace Partition: {selectedAuditDoc.tenantId.slice(0, 18)}...</span>
               </div>
 
               {selectedAuditDoc.piiAudit && (

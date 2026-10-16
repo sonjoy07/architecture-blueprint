@@ -6,17 +6,17 @@ import { Tenant } from '../types';
 export const SYSTEM_TENANTS: Tenant[] = [
   {
     id: 'c4b3a88a-21e1-4c48-8df0-9f5b611e92d8',
-    name: 'Acme Corp [Tenant A]',
-    code: 'TENANT_A',
+    name: 'Acme Corporation',
+    code: 'ACME_GLOBAL',
     plan: 'ENTERPRISE_SOC2',
-    complianceTags: ['SOC 2 Type II', 'PostgreSQL RLS Active', 'Isolated Shard A'],
+    complianceTags: ['SOC 2 Type II', 'Zero-Egress Vault', 'Dedicated Partition'],
   },
   {
     id: '7e2b10a9-3d12-4211-a89e-4a6c8e3100f2',
-    name: 'Nexus Dynamics [Tenant B]',
-    code: 'TENANT_B',
+    name: 'Nexus Dynamics Inc.',
+    code: 'NEXUS_HEALTH',
     plan: 'FINANCIAL_HIPAA',
-    complianceTags: ['HIPAA Compliant', 'PostgreSQL RLS Active', 'Isolated Shard B'],
+    complianceTags: ['HIPAA & HITECH', 'ePHI Guarded', 'Dedicated Partition'],
   },
 ];
 

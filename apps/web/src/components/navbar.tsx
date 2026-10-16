@@ -58,7 +58,7 @@ export function Navbar() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="hidden sm:inline-block text-xs font-medium text-slate-500">
-            Tenant:
+            Workspace:
           </span>
           <select
             value={currentTenant.id}
