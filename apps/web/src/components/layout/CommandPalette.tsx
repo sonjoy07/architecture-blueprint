@@ -176,14 +176,14 @@ export function CommandPalette() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/75 font-mono select-none">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-slate-900/40 backdrop-blur-[2px] font-mono select-none">
       <div
-        className="w-full max-w-2xl bg-[#161920] border border-[#30363D] rounded-[4px] overflow-hidden text-xs animate-in fade-in zoom-in-95 duration-100"
+        className="w-full max-w-2xl bg-[#FFFFFF] border border-[#CBD5E1] shadow-2xl rounded-[4px] overflow-hidden text-xs animate-in fade-in zoom-in-95 duration-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-3.5 py-3 border-b border-[#252A36] bg-[#12141A]">
-          <Search className="w-4 h-4 text-[#8B949E] shrink-0" />
+        <div className="flex items-center gap-3 px-3.5 py-3 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+          <Search className="w-4 h-4 text-[#64748B] shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -194,17 +194,17 @@ export function CommandPalette() {
             }}
             onKeyDown={handleInputKeyDown}
             placeholder="Type a command or search subsystem (e.g. 'audit', 'nexus', 'sonjoy')..."
-            className="w-full bg-transparent text-[#E6EDF3] placeholder-[#484F58] text-[13px] outline-none"
+            className="w-full bg-transparent text-[#0F172A] placeholder-[#94A3B8] text-[13px] outline-none"
           />
-          <kbd className="px-1.5 py-0.5 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[10px] text-[#8B949E]">
+          <kbd className="px-1.5 py-0.5 rounded-[2px] bg-[#FFFFFF] border border-[#CBD5E1] text-[10px] text-[#64748B]">
             ESC
           </kbd>
         </div>
 
         {/* Command Items List */}
-        <div className="max-h-80 overflow-y-auto py-1 divide-y divide-[#252A36]/40">
+        <div className="max-h-80 overflow-y-auto py-1 divide-y divide-[#E2E8F0]">
           {filteredCommands.length === 0 ? (
-            <div className="py-8 text-center text-[#8B949E] font-sans text-xs">
+            <div className="py-8 text-center text-[#64748B] font-sans text-xs">
               No matching commands or policy subsystems found for &quot;{search}&quot;.
             </div>
           ) : (
@@ -221,28 +221,28 @@ export function CommandPalette() {
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors ${
-                    isSelected ? 'bg-[#1F232D] text-[#E6EDF3]' : 'text-[#C9D1D9] hover:bg-[#1F232D]/50'
+                    isSelected ? 'bg-[#EFF6FF] text-[#0F172A]' : 'text-[#334155] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   <div className="flex items-center gap-3 truncate">
                     <div
                       className={`p-1.5 rounded-[3px] border ${
                         isSelected
-                          ? 'bg-[#0E1015] border-[#58A6FF]/40 text-[#58A6FF]'
-                          : 'bg-[#12141A] border-[#252A36] text-[#8B949E]'
+                          ? 'bg-[#DBEAFE] border-[#BFDBFE] text-[#1D4ED8]'
+                          : 'bg-[#F1F5F9] border-[#E2E8F0] text-[#64748B]'
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
                     </div>
                     <div className="truncate">
-                      <div className="font-semibold text-[12px] flex items-center gap-2">
+                      <div className="font-semibold text-[12px] flex items-center gap-2 text-[#0F172A]">
                         <span>{cmd.label}</span>
-                        <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#8B949E] uppercase font-bold">
+                        <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] uppercase font-bold">
                           {cmd.category}
                         </span>
                       </div>
                       {cmd.sublabel && (
-                        <div className="text-[10px] text-[#8B949E] truncate font-sans mt-0.5">
+                        <div className="text-[10px] text-[#64748B] truncate font-sans mt-0.5">
                           {cmd.sublabel}
                         </div>
                       )}
@@ -254,14 +254,14 @@ export function CommandPalette() {
                       <kbd
                         className={`px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold ${
                           cmd.shortcut === 'ACTIVE' || cmd.shortcut === 'CURRENT'
-                            ? 'bg-[#238636]/20 text-[#3FB950] border border-[#238636]/40'
-                            : 'bg-[#0E1015] border border-[#252A36] text-[#8B949E]'
+                            ? 'bg-[#DCFCE7] text-[#15803D] border border-[#BBF7D0]'
+                            : 'bg-[#F1F5F9] border border-[#CBD5E1] text-[#64748B]'
                         }`}
                       >
                         {cmd.shortcut}
                       </kbd>
                     )}
-                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-[#58A6FF]" />}
+                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-[#2563EB]" />}
                   </div>
                 </div>
               );
@@ -270,20 +270,20 @@ export function CommandPalette() {
         </div>
 
         {/* Footer Helper Shortcuts */}
-        <div className="px-3 py-2 bg-[#12141A] border-t border-[#252A36] flex items-center justify-between text-[10px] text-[#8B949E]">
+        <div className="px-3 py-2 bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between text-[10px] text-[#64748B]">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36]">↑</kbd>
-              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36]">↓</kbd>
+              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#FFFFFF] border border-[#CBD5E1]">↑</kbd>
+              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#FFFFFF] border border-[#CBD5E1]">↓</kbd>
               to navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36]">↵</kbd>
+              <kbd className="px-1 py-0.2 rounded-[2px] bg-[#FFFFFF] border border-[#CBD5E1]">↵</kbd>
               to select
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Lock className="w-3 h-3 text-[#58A6FF]" />
+            <Lock className="w-3 h-3 text-[#2563EB]" />
             <span>RLS Context: {currentTenant.id}</span>
           </div>
         </div>

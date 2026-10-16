@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --canvas: #0E1015;
-  --surface: #161920;
-  --focus: #1F232D;
-  --border: #252A36;
-  --border-muted: #30363D;
-  --primary: #E6EDF3;
-  --secondary: #8B949E;
-  --muted: #484F58;
+  --canvas: #F8FAFC;
+  --surface: #FFFFFF;
+  --focus: #E2E8F0;
+  --border: #E2E8F0;
+  --border-muted: #CBD5E1;
+  --primary: #0F172A;
+  --secondary: #475569;
+  --muted: #94A3B8;
 
-  --color-healthy: #238636;
-  --color-healthy-text: #3FB950;
-  --color-warning: #D29922;
-  --color-warning-text: #E3B341;
-  --color-critical: #DA3633;
-  --color-critical-text: #F85149;
-  --color-accent: #2F81F7;
-  --color-accent-text: #58A6FF;
+  --color-healthy: #16A34A;
+  --color-healthy-text: #15803D;
+  --color-warning: #D97706;
+  --color-warning-text: #B45309;
+  --color-critical: #DC2626;
+  --color-critical-text: #B91C1C;
+  --color-accent: #2563EB;
+  --color-accent-text: #1D4ED8;
 }
 
 * {
@@ -28,8 +28,8 @@
 
 html,
 body {
-  background-color: #0E1015;
-  color: #E6EDF3;
+  background-color: #F8FAFC;
+  color: #0F172A;
   font-family: var(--font-plex-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 13px;
   line-height: 1.38;
@@ -52,26 +52,26 @@ kbd {
 .shadow-xl,
 .shadow-2xl,
 .shadow-lg {
-  box-shadow: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Minimal Matte Scrollbar matching Grafana/Sentry */
+/* Crisp Clean Light Scrollbar matching Stripe/GitHub */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0E1015;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #252A36;
+  background: #CBD5E1;
   border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #30363D;
+  background: #94A3B8;
 }
 
 /* Enterprise Input Reset */
@@ -80,14 +80,16 @@ textarea,
 select {
   font-size: 12px;
   line-height: 1.4;
+  background-color: #FFFFFF;
+  color: #0F172A;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #58A6FF !important;
-  box-shadow: 0 0 0 1px #58A6FF !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 1px #2563EB !important;
 }
 
 /* Table Utilities */
@@ -97,5 +99,5 @@ table {
 
 th,
 td {
-  border-color: #252A36;
+  border-color: #E2E8F0;
 }

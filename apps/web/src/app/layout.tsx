@@ -33,9 +33,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${plexSans.variable} ${plexMono.variable} bg-[#0E1015] text-[#E6EDF3]`}
+      className={`light ${plexSans.variable} ${plexMono.variable} bg-[#F8FAFC] text-[#0F172A]`}
     >
-      <body className="antialiased bg-[#0E1015] text-[#E6EDF3] selection:bg-[#238636]/40 selection:text-white min-h-screen font-sans">
+      <body className="antialiased bg-[#F8FAFC] text-[#0F172A] selection:bg-[#2563EB]/20 selection:text-[#0F172A] min-h-screen font-sans">
         <AuthTenantProvider>
           <AuthProvider>
             <TenantProvider>{children}</TenantProvider>

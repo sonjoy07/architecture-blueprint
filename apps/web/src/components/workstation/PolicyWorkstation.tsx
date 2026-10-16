@@ -447,44 +447,44 @@ export function PolicyWorkstation() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-1.75rem)] bg-[#0E1015] text-[#E6EDF3] select-none overflow-hidden font-mono text-[12px] leading-tight">
+    <div className="flex-1 flex flex-col h-[calc(100vh-1.75rem)] bg-[#F8FAFC] text-[#0F172A] select-none overflow-hidden font-mono text-[12px] leading-tight">
       {/* 3-Column Workstation Container */}
-      <div className="flex-1 grid grid-cols-12 divide-x divide-[#252A36] h-full overflow-hidden">
+      <div className="flex-1 grid grid-cols-12 divide-x divide-[#E2E8F0] h-full overflow-hidden">
         {/* ========================================================= */}
         {/* LEFT COLUMN (25% - 3 cols): ACTIVE POLICY INDEX */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-[#0E1015] h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full overflow-hidden">
           {/* Column Header */}
-          <div className="p-2.5 border-b border-[#252A36] bg-[#161920] flex items-center justify-between">
+          <div className="p-2.5 border-b border-[#E2E8F0] bg-[#FFFFFF] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-3.5 h-3.5 text-[#58A6FF]" />
-              <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
+              <BookOpen className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span className="font-semibold text-[#0F172A] text-[11px] uppercase tracking-wider">
                 Policy Index Ledger
               </span>
             </div>
-            <span className="text-[10px] text-[#8B949E] font-mono tabular-nums">
+            <span className="text-[10px] text-[#64748B] font-mono tabular-nums">
               {filteredPolicies.length} Active
             </span>
           </div>
 
           {/* Search Bar */}
-          <div className="p-2 border-b border-[#252A36] bg-[#0E1015]">
+          <div className="p-2 border-b border-[#E2E8F0] bg-[#F8FAFC]">
             <div className="relative">
-              <Search className="w-3 h-3 text-[#8B949E] absolute left-2.5 top-2.5" />
+              <Search className="w-3 h-3 text-[#94A3B8] absolute left-2.5 top-2.5" />
               <input
                 type="text"
                 value={policySearch}
                 onChange={(e) => setPolicySearch(e.target.value)}
                 placeholder="Filter policies by code..."
-                className="w-full bg-[#0D0F14] border border-[#30363D] rounded-[3px] pl-7 pr-2.5 py-1 text-[11px] text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF] font-mono"
+                className="w-full bg-[#FFFFFF] border border-[#CBD5E1] rounded-[3px] pl-7 pr-2.5 py-1 text-[11px] text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] font-mono"
               />
             </div>
             {selectedPolicy && (
-              <div className="mt-1.5 flex items-center justify-between bg-[#161920] border border-[#252A36] rounded-[2px] px-2 py-0.5 text-[10px] text-[#58A6FF]">
+              <div className="mt-1.5 flex items-center justify-between bg-[#EFF6FF] border border-[#BFDBFE] rounded-[2px] px-2 py-0.5 text-[10px] text-[#1D4ED8]">
                 <span>Scope: {selectedPolicy.code}</span>
                 <button
                   onClick={() => setSelectedPolicy(null)}
-                  className="text-[#8B949E] hover:text-[#E6EDF3] cursor-pointer"
+                  className="text-[#64748B] hover:text-[#0F172A] cursor-pointer"
                 >
                   Clear
                 </button>
@@ -493,7 +493,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Policy List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-[#252A36]/60 p-1">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#E2E8F0] p-1 bg-[#FFFFFF]">
             {filteredPolicies.map((pol) => {
               const isSelected = selectedPolicy?.id === pol.id;
               return (
@@ -505,25 +505,25 @@ export function PolicyWorkstation() {
                   }}
                   className={`p-2.5 transition-colors cursor-pointer rounded-[2px] group ${
                     isSelected
-                      ? 'bg-[#1F232D] border-l-2 border-[#58A6FF]'
-                      : 'hover:bg-[#161920] border-l-2 border-transparent'
+                      ? 'bg-[#EFF6FF] border-l-2 border-[#2563EB]'
+                      : 'hover:bg-[#F8FAFC] border-l-2 border-transparent'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-[#E6EDF3] text-[11px] font-mono group-hover:text-[#58A6FF]">
+                    <span className="font-bold text-[#0F172A] text-[11px] font-mono group-hover:text-[#2563EB]">
                       {pol.code}
                     </span>
-                    <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#161920] border border-[#30363D] text-[#8B949E] font-medium">
+                    <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] font-medium">
                       {pol.version}
                     </span>
                   </div>
 
-                  <div className="text-[12px] text-[#8B949E] group-hover:text-[#E6EDF3] font-sans line-clamp-1 mb-1.5">
+                  <div className="text-[12px] text-[#475569] group-hover:text-[#0F172A] font-sans line-clamp-1 mb-1.5">
                     {pol.title}
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] text-[#8B949E] font-mono">
-                    <span className="px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#8B949E] text-[9px]">
+                  <div className="flex items-center justify-between text-[10px] text-[#64748B] font-mono">
+                    <span className="px-1 py-0.2 rounded-[2px] bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] text-[9px]">
                       {pol.tag}
                     </span>
                     <span className="tabular-nums">{pol.chunkCount} Chunks &middot; {pol.lastSynced}</span>
@@ -534,61 +534,61 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Left Footer Shard Status */}
-          <div className="p-2 border-t border-[#252A36] bg-[#161920] text-[10px] text-[#8B949E] flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[#3FB950] font-medium">
-              <Lock className="w-2.5 h-2.5 text-[#3FB950]" />
+          <div className="p-2 border-t border-[#E2E8F0] bg-[#FFFFFF] text-[10px] text-[#64748B] flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-[#15803D] font-medium">
+              <Lock className="w-2.5 h-2.5 text-[#16A34A]" />
               <span>RLS VERIFIED</span>
             </span>
-            <span className="text-[#8B949E]">{currentTenant.id}</span>
+            <span className="text-[#64748B]">{currentTenant.id}</span>
           </div>
         </div>
 
         {/* ========================================================= */}
         {/* CENTER COLUMN (50% - 6 cols): STRUCTURED INVESTIGATION TERMINAL */}
         {/* ========================================================= */}
-        <div className="col-span-6 flex flex-col bg-[#0E1015] h-full overflow-hidden">
+        <div className="col-span-6 flex flex-col bg-[#F8FAFC] h-full overflow-hidden">
           {/* Telemetry Header */}
-          <div className="h-9 border-b border-[#252A36] bg-[#161920] px-3.5 flex items-center justify-between text-[11px]">
+          <div className="h-9 border-b border-[#E2E8F0] bg-[#FFFFFF] px-3.5 flex items-center justify-between text-[11px]">
             <div className="flex items-center gap-2.5">
-              <Terminal className="w-3.5 h-3.5 text-[#58A6FF]" />
-              <span className="font-semibold uppercase tracking-wider text-[#E6EDF3]">
+              <Terminal className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span className="font-semibold uppercase tracking-wider text-[#0F172A]">
                 Investigation Terminal
               </span>
-              <span className="text-[#252A36]">|</span>
-              <span className="text-[10px] text-[#8B949E]">
-                SCOPE: <strong className="text-[#58A6FF] font-semibold">{selectedPolicy ? selectedPolicy.code : 'TENANT_ALL'}</strong>
+              <span className="text-[#CBD5E1]">|</span>
+              <span className="text-[10px] text-[#64748B]">
+                SCOPE: <strong className="text-[#2563EB] font-semibold">{selectedPolicy ? selectedPolicy.code : 'TENANT_ALL'}</strong>
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] text-[#8B949E]">
-              <span className="w-1.5 h-1.5 rounded-[1px] bg-[#238636]" />
+            <div className="flex items-center gap-2 text-[10px] text-[#64748B]">
+              <span className="w-1.5 h-1.5 rounded-[1px] bg-[#16A34A]" />
               <span className="hidden sm:inline">HNSW-1536 Cosine Engine</span>
             </div>
           </div>
 
           {/* Investigation Output Feed */}
-          <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 scroll-smooth">
+          <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 scroll-smooth bg-[#F8FAFC]">
             {investigations.map((inv) => (
               <div
                 key={inv.id}
-                className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3 space-y-2.5 font-mono text-[12px]"
+                className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-[3px] p-3 space-y-2.5 font-mono text-[12px] shadow-sm"
               >
                 {/* Query Header */}
-                <div className="flex items-center justify-between border-b border-[#252A36] pb-1.5 text-[10px] text-[#8B949E]">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-1.5 text-[10px] text-[#64748B]">
                   <div className="flex items-center gap-2">
-                    <span className="text-[#58A6FF] font-semibold uppercase">DISPATCH // {inv.id}</span>
-                    <span className="text-[#484F58]">&middot;</span>
+                    <span className="text-[#2563EB] font-semibold uppercase">DISPATCH // {inv.id}</span>
+                    <span className="text-[#CBD5E1]">&middot;</span>
                     <span className="tabular-nums">{inv.timestamp}</span>
                   </div>
-                  <span className="text-[#8B949E]">{user ? user.email : 'system-session'}</span>
+                  <span className="text-[#64748B]">{user ? user.email : 'system-session'}</span>
                 </div>
 
                 {/* SQL/Terminal Style Query Block */}
-                <div className="bg-[#0E1015] p-2 rounded-[2px] border border-[#252A36] space-y-0.5">
-                  <div className="text-[10px] text-[#484F58]">
+                <div className="bg-[#F8FAFC] p-2 rounded-[2px] border border-[#E2E8F0] space-y-0.5">
+                  <div className="text-[10px] text-[#64748B]">
                     &gt; SELECT ground_truth, synthesis FROM {currentTenant.id}.policies WHERE scope = &apos;{inv.scopedPolicyCode || 'ALL'}&apos;
                   </div>
-                  <div className="text-[12px] text-[#E6EDF3] font-sans">
+                  <div className="text-[12px] text-[#0F172A] font-sans font-medium">
                     &ldquo;{inv.query}&rdquo;
                   </div>
                 </div>
@@ -596,16 +596,16 @@ export function PolicyWorkstation() {
                 {/* Synthesis Output Block */}
                 <div className="space-y-1.5 pt-0.5">
                   <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-[#3FB950] font-medium flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3 h-3 text-[#238636]" />
+                    <span className="text-[#15803D] font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-[#16A34A]" />
                       SYNTHESIZED DIRECTIVE &middot; FAITHFULNESS {inv.telemetry.faithfulnessScore}%
                     </span>
-                    <span className="text-[#8B949E] font-mono tabular-nums">
+                    <span className="text-[#64748B] font-mono tabular-nums">
                       TTFT: {inv.telemetry.ttftMs}ms &middot; Latency: {inv.telemetry.latencyMs}ms
                     </span>
                   </div>
 
-                  <div className="bg-[#0E1015] p-2.5 rounded-[2px] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-[#F8FAFC] p-2.5 rounded-[2px] border border-[#E2E8F0] text-[#0F172A] font-sans text-[12px] leading-relaxed whitespace-pre-wrap">
                     {inv.synthesis.split(/(\[REF-[A-Z]+-\d+\])/g).map((chunk, i) => {
                       if (chunk.startsWith('[REF-')) {
                         return (
@@ -615,7 +615,7 @@ export function PolicyWorkstation() {
                               const found = inv.citations[0] || activePolicies[0].defaultChunk;
                               setPinnedCitation(found);
                             }}
-                            className="inline-flex items-center gap-1 px-1 py-0.2 mx-1 rounded-[2px] bg-[#161920] border border-[#30363D] hover:border-[#58A6FF] text-[#58A6FF] font-mono text-[10px] cursor-pointer transition-colors"
+                            className="inline-flex items-center gap-1 px-1 py-0.2 mx-1 rounded-[2px] bg-[#EFF6FF] border border-[#BFDBFE] hover:border-[#2563EB] text-[#1D4ED8] font-mono text-[10px] cursor-pointer transition-colors"
                             title="Inspect ground-truth chunk in right inspector"
                           >
                             <BookOpen className="w-2.5 h-2.5" />
@@ -626,30 +626,30 @@ export function PolicyWorkstation() {
                       return chunk;
                     })}
                     {inv.isStreaming && (
-                      <span className="inline-block w-1.5 h-3 ml-1 bg-[#58A6FF] animate-pulse align-middle" />
+                      <span className="inline-block w-1.5 h-3 ml-1 bg-[#2563EB] animate-pulse align-middle" />
                     )}
                   </div>
                 </div>
 
                 {/* Grounding Signature & Telemetry Bar */}
-                <div className="pt-2 border-t border-[#252A36] space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                <div className="pt-2 border-t border-[#E2E8F0] space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] text-[#64748B]">
                     <div className="flex items-center gap-2 font-mono">
-                      <span className="flex items-center gap-1 text-[#3FB950] font-semibold">
-                        <ShieldCheck className="w-3 h-3 text-[#3FB950]" />
+                      <span className="flex items-center gap-1 text-[#15803D] font-semibold">
+                        <ShieldCheck className="w-3 h-3 text-[#15803D]" />
                         <span>GROUNDED (RLS)</span>
                       </span>
-                      <span className="text-[#252A36]">|</span>
+                      <span className="text-[#E2E8F0]">|</span>
                       <span>
-                        Latency: <strong className="text-[#E6EDF3]">{inv.telemetry.latencyMs}ms</strong>
+                        Latency: <strong className="text-[#0F172A]">{inv.telemetry.latencyMs}ms</strong>
                       </span>
-                      <span className="text-[#252A36] hidden sm:inline">|</span>
+                      <span className="text-[#E2E8F0] hidden sm:inline">|</span>
                       <span className="hidden sm:inline">
-                        TTFT: <span className="text-[#58A6FF]">{inv.telemetry.ttftMs}ms</span>
+                        TTFT: <span className="text-[#2563EB]">{inv.telemetry.ttftMs}ms</span>
                       </span>
-                      <span className="text-[#252A36] hidden md:inline">|</span>
+                      <span className="text-[#E2E8F0] hidden md:inline">|</span>
                       <span className="hidden md:inline">
-                        Faithfulness: <span className="text-[#3FB950]">{inv.telemetry.faithfulnessScore}%</span>
+                        Faithfulness: <span className="text-[#15803D]">{inv.telemetry.faithfulnessScore}%</span>
                       </span>
                     </div>
 
@@ -657,7 +657,7 @@ export function PolicyWorkstation() {
                       onClick={() =>
                         setExpandedWaterfallId(expandedWaterfallId === inv.id ? null : inv.id)
                       }
-                      className="flex items-center gap-1 text-[10px] text-[#58A6FF] hover:text-[#58A6FF]/80 font-mono cursor-pointer transition-colors"
+                      className="flex items-center gap-1 text-[10px] text-[#2563EB] hover:text-[#1D4ED8] font-mono cursor-pointer transition-colors"
                     >
                       <span>Latency Trace</span>
                       {expandedWaterfallId === inv.id ? (
@@ -670,99 +670,99 @@ export function PolicyWorkstation() {
 
                   {/* Expandable Waterfall Timeline */}
                   {expandedWaterfallId === inv.id && inv.telemetry.waterfall && (
-                    <div className="p-2.5 rounded-[3px] bg-[#0A0C10] border border-[#252A36] space-y-2 text-[10px] font-mono animate-in fade-in">
-                      <div className="flex items-center justify-between text-[#8B949E] border-b border-[#252A36] pb-1.5 text-[9px] uppercase tracking-wider">
+                    <div className="p-2.5 rounded-[3px] bg-[#F8FAFC] border border-[#E2E8F0] space-y-2 text-[10px] font-mono animate-in fade-in">
+                      <div className="flex items-center justify-between text-[#64748B] border-b border-[#E2E8F0] pb-1.5 text-[9px] uppercase tracking-wider">
                         <span>Pipeline Execution Trace Waterfall</span>
                         <span>Engine: pgvector-16.2 / HNSW 1536d Cosine</span>
                       </div>
 
                       {/* Stacked Progress Bar */}
-                      <div className="h-2 w-full bg-[#161920] rounded-[1px] overflow-hidden flex border border-[#252A36]">
+                      <div className="h-2 w-full bg-[#F1F5F9] rounded-[1px] overflow-hidden flex border border-[#E2E8F0]">
                         <div
                           style={{
                             width: `${(inv.telemetry.waterfall.tokenizeMs / inv.telemetry.latencyMs) * 100}%`,
                           }}
-                          className="bg-[#8B949E] h-full"
+                          className="bg-[#94A3B8] h-full"
                           title={`Tokenizer: ${inv.telemetry.waterfall.tokenizeMs}ms`}
                         />
                         <div
                           style={{
                             width: `${(inv.telemetry.waterfall.piiScrubMs / inv.telemetry.latencyMs) * 100}%`,
                           }}
-                          className="bg-[#D29922] h-full"
+                          className="bg-[#F59E0B] h-full"
                           title={`PII Zero-Egress Guard: ${inv.telemetry.waterfall.piiScrubMs}ms`}
                         />
                         <div
                           style={{
                             width: `${(inv.telemetry.waterfall.vectorHnswMs / inv.telemetry.latencyMs) * 100}%`,
                           }}
-                          className="bg-[#58A6FF] h-full"
+                          className="bg-[#3B82F6] h-full"
                           title={`HNSW Search: ${inv.telemetry.waterfall.vectorHnswMs}ms`}
                         />
                         <div
                           style={{
                             width: `${(inv.telemetry.waterfall.crossEncoderMs / inv.telemetry.latencyMs) * 100}%`,
                           }}
-                          className="bg-[#A371F7] h-full"
+                          className="bg-[#8B5CF6] h-full"
                           title={`Cross-Encoder Re-rank: ${inv.telemetry.waterfall.crossEncoderMs}ms`}
                         />
                         <div
                           style={{
                             width: `${(inv.telemetry.waterfall.modelTtftMs / inv.telemetry.latencyMs) * 100}%`,
                           }}
-                          className="bg-[#238636] h-full"
+                          className="bg-[#10B981] h-full"
                           title={`Model TTFT: ${inv.telemetry.waterfall.modelTtftMs}ms`}
                         />
                       </div>
 
                       {/* Stage Breakdown Legend */}
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[9px]">
-                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
-                          <div className="text-[#8B949E] flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-[#8B949E] rounded-[1px]" />
+                        <div className="p-1.5 rounded-[2px] bg-[#FFFFFF] border border-[#E2E8F0] space-y-0.5">
+                          <div className="text-[#64748B] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#94A3B8] rounded-[1px]" />
                             <span>1. Tokenize</span>
                           </div>
-                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                          <div className="font-bold text-[#0F172A] tabular-nums">
                             {inv.telemetry.waterfall.tokenizeMs}ms
                           </div>
                         </div>
 
-                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
-                          <div className="text-[#D29922] flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-[#D29922] rounded-[1px]" />
+                        <div className="p-1.5 rounded-[2px] bg-[#FFFFFF] border border-[#E2E8F0] space-y-0.5">
+                          <div className="text-[#B45309] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#F59E0B] rounded-[1px]" />
                             <span>2. PII Scrub</span>
                           </div>
-                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                          <div className="font-bold text-[#0F172A] tabular-nums">
                             {inv.telemetry.waterfall.piiScrubMs}ms
                           </div>
                         </div>
 
-                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
-                          <div className="text-[#58A6FF] flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-[#58A6FF] rounded-[1px]" />
+                        <div className="p-1.5 rounded-[2px] bg-[#FFFFFF] border border-[#E2E8F0] space-y-0.5">
+                          <div className="text-[#2563EB] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#3B82F6] rounded-[1px]" />
                             <span>3. HNSW Search</span>
                           </div>
-                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                          <div className="font-bold text-[#0F172A] tabular-nums">
                             {inv.telemetry.waterfall.vectorHnswMs}ms
                           </div>
                         </div>
 
-                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
-                          <div className="text-[#A371F7] flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-[#A371F7] rounded-[1px]" />
+                        <div className="p-1.5 rounded-[2px] bg-[#FFFFFF] border border-[#E2E8F0] space-y-0.5">
+                          <div className="text-[#7C3AED] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#8B5CF6] rounded-[1px]" />
                             <span>4. Re-Ranking</span>
                           </div>
-                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                          <div className="font-bold text-[#0F172A] tabular-nums">
                             {inv.telemetry.waterfall.crossEncoderMs}ms
                           </div>
                         </div>
 
-                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
-                          <div className="text-[#3FB950] flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-[#238636] rounded-[1px]" />
+                        <div className="p-1.5 rounded-[2px] bg-[#FFFFFF] border border-[#E2E8F0] space-y-0.5">
+                          <div className="text-[#15803D] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#10B981] rounded-[1px]" />
                             <span>5. Model TTFT</span>
                           </div>
-                          <div className="font-bold text-[#3FB950] tabular-nums">
+                          <div className="font-bold text-[#15803D] tabular-nums">
                             {inv.telemetry.waterfall.modelTtftMs}ms
                           </div>
                         </div>
@@ -776,8 +776,8 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Quick Query Selector Chips */}
-          <div className="px-3 py-1.5 border-t border-[#252A36] bg-[#0E1015] flex flex-wrap gap-1.5 text-[11px]">
-            <span className="text-[10px] text-[#484F58] self-center font-mono uppercase mr-1">
+          <div className="px-3 py-1.5 border-t border-[#E2E8F0] bg-[#F8FAFC] flex flex-wrap gap-1.5 text-[11px]">
+            <span className="text-[10px] text-[#64748B] self-center font-mono uppercase mr-1">
               Inquiries:
             </span>
             {(currentTenant.id === 't_acme_corp'
@@ -796,7 +796,7 @@ export function PolicyWorkstation() {
                 key={idx}
                 onClick={() => handleExecuteQuery(q)}
                 disabled={isExecuting}
-                className="text-[11px] font-sans px-2 py-0.5 rounded-[2px] bg-[#161920] border border-[#252A36] hover:border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors cursor-pointer truncate max-w-xs disabled:opacity-50"
+                className="text-[11px] font-sans px-2 py-0.5 rounded-[2px] bg-[#FFFFFF] border border-[#CBD5E1] hover:border-[#94A3B8] text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer truncate max-w-xs disabled:opacity-50"
               >
                 &ldquo;{q}&rdquo;
               </button>
@@ -804,7 +804,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Prompt Terminal Input */}
-          <div className="p-2.5 border-t border-[#252A36] bg-[#161920]">
+          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF]">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -813,7 +813,7 @@ export function PolicyWorkstation() {
               className="flex items-center gap-2"
             >
               <div className="relative flex-1">
-                <div className="absolute left-2.5 top-2 text-[#58A6FF] text-[11px] font-mono font-bold select-none">
+                <div className="absolute left-2.5 top-2 text-[#2563EB] text-[11px] font-mono font-bold select-none">
                   &gt;
                 </div>
                 <input
@@ -823,9 +823,9 @@ export function PolicyWorkstation() {
                   onChange={(e) => setInputQuery(e.target.value)}
                   placeholder={`Execute policy query on ${currentTenant.name} (Cmd+K)...`}
                   disabled={isExecuting}
-                  className="w-full bg-[#0D0F14] border border-[#30363D] rounded-[3px] pl-6 pr-16 py-1.5 text-[12px] text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF] font-mono disabled:opacity-60"
+                  className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-[3px] pl-6 pr-16 py-1.5 text-[12px] text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] font-mono disabled:opacity-60"
                 />
-                <div className="absolute right-2 top-2 text-[10px] text-[#484F58] font-mono hidden sm:inline">
+                <div className="absolute right-2 top-2 text-[10px] text-[#94A3B8] font-mono hidden sm:inline">
                   Enter ↵
                 </div>
               </div>
@@ -833,10 +833,10 @@ export function PolicyWorkstation() {
               <button
                 type="submit"
                 disabled={!inputQuery.trim() || isExecuting}
-                className="px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#C9D1D9] font-medium text-[11px] font-mono flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
+                className="px-3 py-1.5 rounded-[3px] bg-[#0F172A] hover:bg-[#1E293B] border border-[#0F172A] text-white font-medium text-[11px] font-mono flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
               >
                 <span>Execute</span>
-                <Send className="w-3 h-3 text-[#58A6FF]" />
+                <Send className="w-3 h-3 text-white" />
               </button>
             </form>
           </div>
@@ -845,54 +845,54 @@ export function PolicyWorkstation() {
         {/* ========================================================= */}
         {/* RIGHT COLUMN (25% - 3 cols): MULTI-MODE INSPECTOR */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-[#0E1015] h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full overflow-hidden">
           {/* Header & Tabs */}
-          <div className="border-b border-[#252A36] bg-[#161920]">
-            <div className="p-2.5 flex items-center justify-between border-b border-[#252A36]">
+          <div className="border-b border-[#E2E8F0] bg-[#FFFFFF]">
+            <div className="p-2.5 flex items-center justify-between border-b border-[#E2E8F0]">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#3FB950]" />
-                <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#15803D]" />
+                <span className="font-semibold text-[#0F172A] text-[11px] uppercase tracking-wider">
                   Ground-Truth Inspector
                 </span>
               </div>
-              <span className="text-[10px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#58A6FF] font-mono">
+              <span className="text-[10px] px-1 py-0.2 rounded-[2px] bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] font-mono">
                 CHUNK #{pinnedCitation.chunkId}
               </span>
             </div>
 
             {/* 3 Inspection Sub-Tabs */}
-            <div className="flex items-center divide-x divide-[#252A36] text-[10px] font-mono">
+            <div className="flex items-center divide-x divide-[#E2E8F0] text-[10px] font-mono">
               <button
                 onClick={() => setInspectorTab('PASSAGE')}
                 className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
                   inspectorTab === 'PASSAGE'
-                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
-                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                    ? 'bg-[#F1F5F9] text-[#0F172A] font-bold border-b-2 border-[#2563EB]'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                 }`}
               >
-                <FileText className="w-3 h-3 text-[#58A6FF]" />
+                <FileText className="w-3 h-3 text-[#2563EB]" />
                 <span>Passage</span>
               </button>
               <button
                 onClick={() => setInspectorTab('PDF_VIEW')}
                 className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
                   inspectorTab === 'PDF_VIEW'
-                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
-                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                    ? 'bg-[#F1F5F9] text-[#0F172A] font-bold border-b-2 border-[#2563EB]'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                 }`}
               >
-                <FileCode className="w-3 h-3 text-[#E3B341]" />
+                <FileCode className="w-3 h-3 text-[#B45309]" />
                 <span>In-Situ PDF</span>
               </button>
               <button
                 onClick={() => setInspectorTab('GRAPH')}
                 className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
                   inspectorTab === 'GRAPH'
-                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
-                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                    ? 'bg-[#F1F5F9] text-[#0F172A] font-bold border-b-2 border-[#2563EB]'
+                    : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                 }`}
               >
-                <Network className="w-3 h-3 text-[#3FB950]" />
+                <Network className="w-3 h-3 text-[#15803D]" />
                 <span>Graph</span>
               </button>
             </div>
@@ -904,51 +904,51 @@ export function PolicyWorkstation() {
               <>
                 {/* Document Title & Section */}
                 <div className="space-y-0.5">
-                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                  <span className="text-[10px] text-[#64748B] uppercase tracking-wider block font-semibold">
                     Source Document
                   </span>
-                  <div className="text-[12px] text-[#E6EDF3] font-semibold font-sans">
+                  <div className="text-[12px] text-[#0F172A] font-semibold font-sans">
                     {pinnedCitation.documentTitle}
                   </div>
-                  <div className="text-[10px] text-[#58A6FF] font-mono">
+                  <div className="text-[10px] text-[#2563EB] font-mono">
                     {pinnedCitation.section || 'General Governance Clause'}
                   </div>
                 </div>
 
                 {/* Verification Metadata Box */}
-                <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-2.5 space-y-1.5 text-[11px] font-mono">
+                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-[3px] p-2.5 space-y-1.5 text-[11px] font-mono">
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">Page:</span>
-                    <span className="text-[#E6EDF3] font-semibold tabular-nums">Page {pinnedCitation.page}</span>
+                    <span className="text-[#64748B]">Page:</span>
+                    <span className="text-[#0F172A] font-semibold tabular-nums">Page {pinnedCitation.page}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">Cosine Distance:</span>
-                    <span className="text-[#3FB950] font-semibold tabular-nums">
+                    <span className="text-[#64748B]">Cosine Distance:</span>
+                    <span className="text-[#15803D] font-semibold tabular-nums">
                       {(1 - pinnedCitation.similarityScore).toFixed(4)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">Similarity Metric:</span>
-                    <span className="text-[#E6EDF3] tabular-nums">
+                    <span className="text-[#64748B]">Similarity Metric:</span>
+                    <span className="text-[#0F172A] tabular-nums">
                       {(pinnedCitation.similarityScore * 100).toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">Tenant Boundary:</span>
-                    <span className="text-[#58A6FF] font-medium">{currentTenant.id}</span>
+                    <span className="text-[#64748B]">Tenant Boundary:</span>
+                    <span className="text-[#2563EB] font-medium">{currentTenant.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">Shard Partition:</span>
-                    <span className="text-[#E6EDF3]">{currentTenant.shardId || 'shard-us-east-4a'}</span>
+                    <span className="text-[#64748B]">Shard Partition:</span>
+                    <span className="text-[#0F172A]">{currentTenant.shardId || 'shard-us-east-4a'}</span>
                   </div>
                 </div>
 
                 {/* Source SHA-256 Hash */}
                 <div className="space-y-0.5">
-                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                  <span className="text-[10px] text-[#64748B] uppercase tracking-wider block font-semibold">
                     Chunk SHA-256 Hash
                   </span>
-                  <div className="p-2 rounded-[2px] bg-[#161920] border border-[#252A36] text-[10px] text-[#8B949E] font-mono break-all leading-tight">
+                  <div className="p-2 rounded-[2px] bg-[#F8FAFC] border border-[#E2E8F0] text-[10px] text-[#64748B] font-mono break-all leading-tight">
                     {activePolicies.find((p) => p.title.includes(pinnedCitation.documentTitle))
                       ?.sha256Hash || 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'}
                   </div>
@@ -956,10 +956,10 @@ export function PolicyWorkstation() {
 
                 {/* Verbatim Source Passage */}
                 <div className="space-y-1">
-                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                  <span className="text-[10px] text-[#64748B] uppercase tracking-wider block font-semibold">
                     Verbatim Extracted Chunk
                   </span>
-                  <div className="p-2.5 rounded-[3px] bg-[#161920] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap select-text">
+                  <div className="p-2.5 rounded-[3px] bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] font-sans text-[12px] leading-relaxed whitespace-pre-wrap select-text">
                     &ldquo;{pinnedCitation.rawText}&rdquo;
                   </div>
                 </div>
@@ -969,52 +969,52 @@ export function PolicyWorkstation() {
             {/* TAB 2: IN-SITU SIMULATED PDF VIEW */}
             {inspectorTab === 'PDF_VIEW' && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                <div className="flex items-center justify-between text-[10px] text-[#64748B]">
                   <span>DOCUMENT PREVIEW // PAGE {pinnedCitation.page}</span>
-                  <span className="text-[#3FB950] font-bold">100% OCR VERIFIED</span>
+                  <span className="text-[#15803D] font-bold">100% OCR VERIFIED</span>
                 </div>
 
                 {/* Simulated Paper Document Sheet */}
-                <div className="p-4 rounded-[3px] bg-[#12141A] border border-[#252A36] space-y-3 relative overflow-hidden font-sans text-[11px] select-text">
+                <div className="p-4 rounded-[3px] bg-[#FFFFFF] border border-[#CBD5E1] shadow-sm space-y-3 relative overflow-hidden font-sans text-[11px] select-text">
                   {/* Watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-2xl font-black uppercase rotate-[-25deg] text-[#E6EDF3]">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-2xl font-black uppercase rotate-[-25deg] text-[#0F172A]">
                     CONFIDENTIAL - {currentTenant.name}
                   </div>
 
                   {/* Document Stamp Header */}
-                  <div className="border-b border-[#252A36] pb-2 flex items-center justify-between text-[9px] font-mono text-[#8B949E]">
+                  <div className="border-b border-[#E2E8F0] pb-2 flex items-center justify-between text-[9px] font-mono text-[#64748B]">
                     <div>
-                      <span className="font-bold text-[#E6EDF3] block">{pinnedCitation.documentTitle}</span>
+                      <span className="font-bold text-[#0F172A] block">{pinnedCitation.documentTitle}</span>
                       <span>PAGE {pinnedCitation.page} &middot; REVISION 2026.4</span>
                     </div>
-                    <div className="px-1.5 py-0.5 rounded-[2px] bg-[#161920] border border-[#30363D] text-[#58A6FF]">
+                    <div className="px-1.5 py-0.5 rounded-[2px] bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8]">
                       SEC-LEVEL: T1
                     </div>
                   </div>
 
                   {/* Surrounding Context Section 1 */}
-                  <div className="text-[#8B949E] text-[10px] leading-relaxed">
+                  <div className="text-[#64748B] text-[10px] leading-relaxed">
                     § 4.2 Scope of Operations — This operational protocol governs all cryptographic hardware keys, perimeter security boundaries, and corporate access control protocols under standard corporate oversight.
                   </div>
 
                   {/* Target Cited Passage Highlight Box */}
-                  <div className="p-2.5 rounded-[3px] bg-[#E3B341]/10 border-l-2 border-[#E3B341] space-y-1">
-                    <div className="flex items-center justify-between text-[9px] font-mono text-[#E3B341] font-bold">
+                  <div className="p-2.5 rounded-[3px] bg-[#FEF3C7]/60 border-l-2 border-[#D97706] space-y-1">
+                    <div className="flex items-center justify-between text-[9px] font-mono text-[#B45309] font-bold">
                       <span>CITED PASSAGE #{pinnedCitation.chunkId}</span>
                       <span>COSINE DIST: {(1 - pinnedCitation.similarityScore).toFixed(4)}</span>
                     </div>
-                    <p className="text-[#E6EDF3] leading-relaxed font-medium">
+                    <p className="text-[#0F172A] leading-relaxed font-medium">
                       {pinnedCitation.rawText}
                     </p>
                   </div>
 
                   {/* Surrounding Context Section 2 */}
-                  <div className="text-[#8B949E] text-[10px] leading-relaxed">
+                  <div className="text-[#64748B] text-[10px] leading-relaxed">
                     § 4.4 Non-Compliance Repercussions — Any attempt to circumvent identity boundary guards or access production shard partitions without prior approval triggers immediate revocation of role grants and logs an incident to the compliance audit database.
                   </div>
 
                   {/* Footer Stamp */}
-                  <div className="pt-2 border-t border-[#252A36] flex items-center justify-between text-[9px] font-mono text-[#484F58]">
+                  <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between text-[9px] font-mono text-[#94A3B8]">
                     <span>HASH: {pinnedCitation.rawText.substring(0, 24)}...</span>
                     <span>HMAC-SHA256 SIGNED</span>
                   </div>
@@ -1025,82 +1025,82 @@ export function PolicyWorkstation() {
             {/* TAB 3: INTERACTIVE KNOWLEDGE GRAPH */}
             {inspectorTab === 'GRAPH' && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                <div className="flex items-center justify-between text-[10px] text-[#64748B]">
                   <span>POLICY CLAUSE DEPENDENCY GRAPH</span>
-                  <span className="text-[#58A6FF] font-bold">INTERACTIVE</span>
+                  <span className="text-[#2563EB] font-bold">INTERACTIVE</span>
                 </div>
 
-                <div className="p-2 rounded-[3px] bg-[#12141A] border border-[#252A36]">
+                <div className="p-2 rounded-[3px] bg-[#F8FAFC] border border-[#E2E8F0]">
                   {/* SVG Policy Knowledge Graph */}
                   <svg viewBox="0 0 320 240" className="w-full h-56 select-none font-mono">
                     <defs>
                       <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#252A36" />
-                        <stop offset="100%" stopColor="#58A6FF" stopOpacity="0.8" />
+                        <stop offset="0%" stopColor="#CBD5E1" />
+                        <stop offset="100%" stopColor="#2563EB" stopOpacity="0.8" />
                       </linearGradient>
                     </defs>
 
                     {/* Connecting Edges */}
-                    <line x1="160" y1="120" x2="60" y2="50" stroke="#252A36" strokeWidth="1.5" strokeDasharray="3 3" />
-                    <line x1="160" y1="120" x2="260" y2="50" stroke="#58A6FF" strokeWidth="1.5" />
-                    <line x1="160" y1="120" x2="60" y2="190" stroke="#252A36" strokeWidth="1.5" />
-                    <line x1="160" y1="120" x2="260" y2="190" stroke="#238636" strokeWidth="1.5" />
-                    <line x1="260" y1="50" x2="260" y2="190" stroke="#252A36" strokeWidth="1" strokeDasharray="2 2" />
+                    <line x1="160" y1="120" x2="60" y2="50" stroke="#CBD5E1" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <line x1="160" y1="120" x2="260" y2="50" stroke="#2563EB" strokeWidth="1.5" />
+                    <line x1="160" y1="120" x2="60" y2="190" stroke="#CBD5E1" strokeWidth="1.5" />
+                    <line x1="160" y1="120" x2="260" y2="190" stroke="#16A34A" strokeWidth="1.5" />
+                    <line x1="260" y1="50" x2="260" y2="190" stroke="#CBD5E1" strokeWidth="1" strokeDasharray="2 2" />
 
                     {/* Center Root Node */}
-                    <circle cx="160" cy="120" r="26" fill="#161920" stroke="#58A6FF" strokeWidth="2" />
-                    <text x="160" y="117" textAnchor="middle" fill="#E6EDF3" fontSize="8" fontWeight="bold">
+                    <circle cx="160" cy="120" r="26" fill="#FFFFFF" stroke="#2563EB" strokeWidth="2" />
+                    <text x="160" y="117" textAnchor="middle" fill="#0F172A" fontSize="8" fontWeight="bold">
                       {currentTenant.id.toUpperCase()}
                     </text>
-                    <text x="160" y="128" textAnchor="middle" fill="#58A6FF" fontSize="7">
+                    <text x="160" y="128" textAnchor="middle" fill="#2563EB" fontSize="7">
                       VAULT
                     </text>
 
                     {/* Node 1: Top Left */}
-                    <circle cx="60" cy="50" r="20" fill="#161920" stroke="#30363D" strokeWidth="1.5" />
-                    <text x="60" y="48" textAnchor="middle" fill="#C9D1D9" fontSize="7" fontWeight="bold">
+                    <circle cx="60" cy="50" r="20" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" />
+                    <text x="60" y="48" textAnchor="middle" fill="#0F172A" fontSize="7" fontWeight="bold">
                       ISO27001
                     </text>
-                    <text x="60" y="58" textAnchor="middle" fill="#8B949E" fontSize="6">
+                    <text x="60" y="58" textAnchor="middle" fill="#64748B" fontSize="6">
                       CONTROLS
                     </text>
 
                     {/* Node 2: Top Right (Active Cited Policy) */}
-                    <circle cx="260" cy="50" r="24" fill="#0C1C36" stroke="#58A6FF" strokeWidth="2" />
-                    <text x="260" y="47" textAnchor="middle" fill="#E6EDF3" fontSize="7" fontWeight="bold">
+                    <circle cx="260" cy="50" r="24" fill="#EFF6FF" stroke="#2563EB" strokeWidth="2" />
+                    <text x="260" y="47" textAnchor="middle" fill="#0F172A" fontSize="7" fontWeight="bold">
                       ACTIVE
                     </text>
-                    <text x="260" y="57" textAnchor="middle" fill="#58A6FF" fontSize="6">
+                    <text x="260" y="57" textAnchor="middle" fill="#2563EB" fontSize="6">
                       CHUNK #{pinnedCitation.chunkId}
                     </text>
 
                     {/* Node 3: Bottom Left */}
-                    <circle cx="60" cy="190" r="20" fill="#161920" stroke="#30363D" strokeWidth="1.5" />
-                    <text x="60" y="188" textAnchor="middle" fill="#C9D1D9" fontSize="7" fontWeight="bold">
+                    <circle cx="60" cy="190" r="20" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" />
+                    <text x="60" y="188" textAnchor="middle" fill="#0F172A" fontSize="7" fontWeight="bold">
                       PII MASK
                     </text>
-                    <text x="60" y="198" textAnchor="middle" fill="#D29922" fontSize="6">
+                    <text x="60" y="198" textAnchor="middle" fill="#B45309" fontSize="6">
                       LUHN/NID
                     </text>
 
                     {/* Node 4: Bottom Right */}
-                    <circle cx="260" cy="190" r="22" fill="#0E2316" stroke="#238636" strokeWidth="1.5" />
-                    <text x="260" y="188" textAnchor="middle" fill="#E6EDF3" fontSize="7" fontWeight="bold">
+                    <circle cx="260" cy="190" r="22" fill="#F0FDF4" stroke="#16A34A" strokeWidth="1.5" />
+                    <text x="260" y="188" textAnchor="middle" fill="#0F172A" fontSize="7" fontWeight="bold">
                       RLS LOCK
                     </text>
-                    <text x="260" y="198" textAnchor="middle" fill="#3FB950" fontSize="6">
+                    <text x="260" y="198" textAnchor="middle" fill="#15803D" fontSize="6">
                       ZERO LEAK
                     </text>
                   </svg>
 
-                  <div className="p-2 border-t border-[#252A36] text-[10px] text-[#8B949E] space-y-1">
+                  <div className="p-2 border-t border-[#E2E8F0] text-[10px] text-[#64748B] space-y-1">
                     <div className="flex items-center justify-between">
                       <span>Cross-Referenced Directives:</span>
-                      <span className="text-[#E6EDF3] font-bold">4 Nodes Active</span>
+                      <span className="text-[#0F172A] font-bold">4 Nodes Active</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Regulatory Harmonization:</span>
-                      <span className="text-[#3FB950]">100% Policy Bound</span>
+                      <span className="text-[#15803D]">100% Policy Bound</span>
                     </div>
                   </div>
                 </div>
@@ -1109,29 +1109,29 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Action Footer */}
-          <div className="p-2.5 border-t border-[#252A36] bg-[#161920] flex items-center gap-1.5">
+          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF] flex items-center gap-1.5">
             <button
               onClick={copyChunk}
-              className="flex-1 py-1 px-2 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#C9D1D9] text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="flex-1 py-1 px-2 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] border border-[#CBD5E1] text-[#0F172A] text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               {copiedCitation ? (
                 <>
-                  <Check className="w-3 h-3 text-[#3FB950]" />
+                  <Check className="w-3 h-3 text-[#15803D]" />
                   <span>Copied</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3 h-3 text-[#8B949E]" />
+                  <Copy className="w-3 h-3 text-[#64748B]" />
                   <span>Copy Passage</span>
                 </>
               )}
             </button>
             <button
               onClick={downloadCertificate}
-              className="p-1 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors cursor-pointer"
+              className="p-1 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] border border-[#CBD5E1] text-[#64748B] hover:text-[#0F172A] transition-colors cursor-pointer"
               title="Download Signed Proof JSON"
             >
-              <Download className="w-3.5 h-3.5 text-[#58A6FF]" />
+              <Download className="w-3.5 h-3.5 text-[#2563EB]" />
             </button>
           </div>
         </div>
