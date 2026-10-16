@@ -1,5 +1,5 @@
-import { CopilotView } from '../../../components/views/CopilotView';
+import { PolicyWorkstation } from '../../../components/workstation/PolicyWorkstation';
 
 export default function CopilotPage() {
-  return <CopilotView />;
+  return <PolicyWorkstation />;
 }

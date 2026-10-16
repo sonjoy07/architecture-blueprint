@@ -26,13 +26,59 @@ export const SYSTEM_TENANTS: Tenant[] = [
   },
 ];
 
+export const CORPORATE_PERSONAS = {
+  sonjoy: {
+    id: 'usr-sonjoy-01',
+    name: 'Sonjoy Biswas',
+    title: 'Infra & Org Admin',
+    email: 'sonjoy.biswas@acmewave.internal',
+    role: 'ORG_ADMIN' as UserRole,
+    tenantId: 't_acme_corp' as TenantId,
+    tenantName: 'Acme Corporation',
+    authProvider: 'Okta Enterprise SSO (SAML 2.0 / FIDO2)',
+    mfaVerified: true,
+    avatarText: 'SB',
+    assignedRoleDescription:
+      'Full administrative access across document ingestion, RLS partitions, copilot execution, and compliance telemetry.',
+  },
+  sarah: {
+    id: 'usr-sarah-02',
+    name: 'Dr. Sarah Khan',
+    title: 'Compliance Officer',
+    email: 'sarah.khan@acmewave.internal',
+    role: 'COMPLIANCE_AUDITOR' as UserRole,
+    tenantId: 't_acme_corp' as TenantId,
+    tenantName: 'Acme Corporation',
+    authProvider: 'Okta Enterprise SSO (SAML 2.0 / FIDO2)',
+    mfaVerified: true,
+    avatarText: 'SK',
+    assignedRoleDescription:
+      'Read-only access to PII redaction event logs, legal grounding certificates, and immutable audit trails. Ingestion and interactive query are prohibited.',
+  },
+  alex: {
+    id: 'usr-alex-03',
+    name: 'Alex Rivera',
+    title: 'External Consultant',
+    email: 'alex.rivera@consultant.external',
+    role: 'MEMBER' as UserRole,
+    tenantId: 't_nexus_health' as TenantId,
+    tenantName: 'Nexus Dynamics Inc.',
+    authProvider: 'Microsoft Entra ID (Federated External)',
+    mfaVerified: true,
+    avatarText: 'AR',
+    assignedRoleDescription:
+      'Standard query authorization against certified tenant policies. Restricted from viewing raw redaction telemetry or triggering document ingestion.',
+  },
+};
+
 export const ROLE_DEFINITIONS: Record<
   UserRole,
   { label: string; description: string; permissions: Permission[] }
 > = {
   ORG_ADMIN: {
     label: 'Organization Administrator',
-    description: 'Full administrative access across document ingestion, RLS partitions, copilot execution, and compliance telemetry.',
+    description:
+      'Full administrative access across document ingestion, RLS partitions, copilot execution, and compliance telemetry.',
     permissions: [
       'documents:write',
       'documents:delete',
@@ -44,21 +90,27 @@ export const ROLE_DEFINITIONS: Record<
   },
   COMPLIANCE_AUDITOR: {
     label: 'Compliance Auditor',
-    description: 'Read-only access to PII redaction event logs, legal grounding certificates, and immutable audit trails. Ingestion and interactive query are prohibited.',
+    description:
+      'Read-only access to PII redaction event logs, legal grounding certificates, and immutable audit trails. Ingestion and interactive query are prohibited.',
     permissions: ['audit:read', 'audit:export'],
   },
   MEMBER: {
     label: 'Enterprise Member',
-    description: 'Standard query authorization against certified tenant policies. Restricted from viewing raw redaction telemetry or triggering document ingestion.',
+    description:
+      'Standard query authorization against certified tenant policies. Restricted from viewing raw redaction telemetry or triggering document ingestion.',
     permissions: ['copilot:query'],
   },
 };
 
 interface AuthTenantContextValue {
   currentTenant: Tenant;
-  user: UserSession;
+  user: UserSession | null;
+  isAuthenticated: boolean;
   availableTenants: Tenant[];
   availableRoles: UserRole[];
+  loginAsPersona: (personaKey: 'sonjoy' | 'sarah' | 'alex') => void;
+  loginWithSso: (email: string, tenantId?: TenantId, role?: UserRole, name?: string) => void;
+  logout: () => void;
   switchTenant: (tenantId: TenantId) => void;
   switchRole: (role: UserRole) => void;
   hasPermission: (permission: Permission) => boolean;
@@ -70,65 +122,169 @@ const AuthTenantContext = createContext<AuthTenantContextValue | undefined>(unde
 
 export function AuthTenantProvider({ children }: { children: React.ReactNode }) {
   const [currentTenant, setCurrentTenant] = useState<Tenant>(SYSTEM_TENANTS[0]);
-  const [currentRole, setCurrentRole] = useState<UserRole>('ORG_ADMIN');
+  const [user, setUser] = useState<UserSession | null>(null);
   const [isReady, setIsReady] = useState(false);
 
-  // Sync session and cookie with localStorage
+  // Restore authenticated session from cookies / localStorage
   useEffect(() => {
     try {
-      const savedTenantId = localStorage.getItem('saas.active_tenant_id') as TenantId;
-      if (savedTenantId) {
-        const foundTenant = SYSTEM_TENANTS.find((t) => t.id === savedTenantId);
-        if (foundTenant) setCurrentTenant(foundTenant);
+      // Check for sentrydocs_session cookie or localStorage
+      let sessionData: UserSession | null = null;
+
+      const storedSession = localStorage.getItem('sentrydocs_session');
+      if (storedSession) {
+        sessionData = JSON.parse(storedSession);
+      } else if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split('; ');
+        const foundCookie = cookies.find((c) => c.startsWith('sentrydocs_session='));
+        if (foundCookie) {
+          const cookieVal = decodeURIComponent(foundCookie.split('=')[1]);
+          sessionData = JSON.parse(cookieVal);
+        }
       }
 
-      const savedRole = localStorage.getItem('saas.active_user_role') as UserRole;
-      if (savedRole && ROLE_DEFINITIONS[savedRole]) {
-        setCurrentRole(savedRole);
+      if (sessionData && sessionData.id) {
+        setUser(sessionData);
+        const matchedTenant = SYSTEM_TENANTS.find((t) => t.id === sessionData.tenantId) || SYSTEM_TENANTS[0];
+        setCurrentTenant(matchedTenant);
       }
     } catch {
-      // LocalStorage access may fail in restricted sandboxes
+      // ignore JSON parse or storage restriction
     } finally {
       setIsReady(true);
     }
   }, []);
 
-  // Set cookie for proxy inspection whenever tenant changes
-  useEffect(() => {
+  const persistSession = useCallback((session: UserSession, tenant: Tenant) => {
+    setUser(session);
+    setCurrentTenant(tenant);
+
+    try {
+      localStorage.setItem('sentrydocs_session', JSON.stringify(session));
+      localStorage.setItem('saas.active_tenant_id', tenant.id);
+      localStorage.setItem('saas.active_user_role', session.role);
+    } catch {
+      // ignore
+    }
+
     if (typeof document !== 'undefined') {
-      document.cookie = `x-tenant-id=${currentTenant.id}; path=/; SameSite=Strict`;
-    }
-  }, [currentTenant]);
-
-  const switchTenant = useCallback((tenantId: TenantId) => {
-    const matched = SYSTEM_TENANTS.find((t) => t.id === tenantId);
-    if (matched) {
-      setCurrentTenant(matched);
-      try {
-        localStorage.setItem('saas.active_tenant_id', matched.id);
-      } catch {
-        // ignore
-      }
+      const serialized = encodeURIComponent(JSON.stringify(session));
+      document.cookie = `sentrydocs_session=${serialized}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `x-tenant-id=${tenant.id}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `x-user-role=${session.role}; path=/; max-age=86400; SameSite=Lax`;
     }
   }, []);
 
-  const switchRole = useCallback((role: UserRole) => {
-    if (ROLE_DEFINITIONS[role]) {
-      setCurrentRole(role);
-      try {
-        localStorage.setItem('saas.active_user_role', role);
-      } catch {
-        // ignore
-      }
+  const loginAsPersona = useCallback(
+    (personaKey: 'sonjoy' | 'sarah' | 'alex') => {
+      const persona = CORPORATE_PERSONAS[personaKey];
+      if (!persona) return;
+
+      const tenant = SYSTEM_TENANTS.find((t) => t.id === persona.tenantId) || SYSTEM_TENANTS[0];
+      const session: UserSession = {
+        id: persona.id,
+        name: persona.name,
+        email: persona.email,
+        role: persona.role,
+        tenantId: persona.tenantId,
+        tenantName: persona.tenantName,
+        authProvider: persona.authProvider,
+        mfaVerified: persona.mfaVerified,
+        avatarText: persona.avatarText,
+        assignedRoleDescription: persona.assignedRoleDescription,
+      };
+
+      persistSession(session, tenant);
+    },
+    [persistSession]
+  );
+
+  const loginWithSso = useCallback(
+    (email: string, tenantId: TenantId = 't_acme_corp', role: UserRole = 'MEMBER', name?: string) => {
+      const tenant = SYSTEM_TENANTS.find((t) => t.id === tenantId) || SYSTEM_TENANTS[0];
+      const initials = name
+        ? name
+            .split(' ')
+            .map((p) => p[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+        : email.slice(0, 2).toUpperCase();
+
+      const session: UserSession = {
+        id: `usr-sso-${Date.now()}`,
+        name: name || email.split('@')[0].replace('.', ' '),
+        email,
+        role,
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        authProvider: 'Okta SAML 2.0 (SSO Federated)',
+        mfaVerified: true,
+        avatarText: initials || 'ID',
+        assignedRoleDescription: ROLE_DEFINITIONS[role].description,
+      };
+
+      persistSession(session, tenant);
+    },
+    [persistSession]
+  );
+
+  const logout = useCallback(() => {
+    setUser(null);
+    try {
+      localStorage.removeItem('sentrydocs_session');
+      localStorage.removeItem('saas.active_tenant_id');
+      localStorage.removeItem('saas.active_user_role');
+    } catch {
+      // ignore
+    }
+
+    if (typeof document !== 'undefined') {
+      document.cookie = 'sentrydocs_session=; path=/; max-age=0';
+      document.cookie = 'x-tenant-id=; path=/; max-age=0';
+      document.cookie = 'x-user-role=; path=/; max-age=0';
+    }
+
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
     }
   }, []);
+
+  const switchTenant = useCallback(
+    (tenantId: TenantId) => {
+      const matched = SYSTEM_TENANTS.find((t) => t.id === tenantId);
+      if (matched) {
+        setCurrentTenant(matched);
+        if (user) {
+          const updatedUser = { ...user, tenantId: matched.id, tenantName: matched.name };
+          persistSession(updatedUser, matched);
+        }
+      }
+    },
+    [user, persistSession]
+  );
+
+  const switchRole = useCallback(
+    (role: UserRole) => {
+      if (ROLE_DEFINITIONS[role] && user) {
+        const updatedUser = {
+          ...user,
+          role,
+          assignedRoleDescription: ROLE_DEFINITIONS[role].description,
+        };
+        persistSession(updatedUser, currentTenant);
+      }
+    },
+    [user, currentTenant, persistSession]
+  );
 
   const hasPermission = useCallback(
     (permission: Permission): boolean => {
-      const roleDef = ROLE_DEFINITIONS[currentRole];
+      if (!user) return false;
+      const roleDef = ROLE_DEFINITIONS[user.role];
       return roleDef ? roleDef.permissions.includes(permission) : false;
     },
-    [currentRole]
+    [user]
   );
 
   const getApiHeaders = useCallback(
@@ -136,44 +292,24 @@ export function AuthTenantProvider({ children }: { children: React.ReactNode }) 
       return {
         'Content-Type': 'application/json',
         'x-tenant-id': currentTenant.id,
-        'x-user-role': currentRole,
+        'x-user-role': user ? user.role : 'MEMBER',
         ...extraHeaders,
       };
     },
-    [currentTenant, currentRole]
+    [currentTenant, user]
   );
-
-  // Compute active user session representation
-  const user: UserSession = {
-    id: currentRole === 'ORG_ADMIN' ? 'usr-adm-01' : currentRole === 'COMPLIANCE_AUDITOR' ? 'usr-aud-02' : 'usr-mem-03',
-    name:
-      currentRole === 'ORG_ADMIN'
-        ? 'Marcus Sterling'
-        : currentRole === 'COMPLIANCE_AUDITOR'
-        ? 'Elena Rostova (Auditor)'
-        : 'David K. Vance',
-    email:
-      currentRole === 'ORG_ADMIN'
-        ? `m.sterling@${currentTenant.id === 't_acme_corp' ? 'acmewave.internal' : 'nexushealth.internal'}`
-        : currentRole === 'COMPLIANCE_AUDITOR'
-        ? 'e.rostova@thirdparty-audit.org'
-        : `d.vance@${currentTenant.id === 't_acme_corp' ? 'acmewave.internal' : 'nexushealth.internal'}`,
-    role: currentRole,
-    tenantId: currentTenant.id,
-    tenantName: currentTenant.name,
-    authProvider: 'Corporate Identity Broker (SAML 2.0 / FIDO2)',
-    mfaVerified: true,
-    avatarText: currentRole === 'ORG_ADMIN' ? 'MS' : currentRole === 'COMPLIANCE_AUDITOR' ? 'ER' : 'DV',
-    assignedRoleDescription: ROLE_DEFINITIONS[currentRole].description,
-  };
 
   return (
     <AuthTenantContext.Provider
       value={{
         currentTenant,
         user,
+        isAuthenticated: Boolean(user),
         availableTenants: SYSTEM_TENANTS,
         availableRoles: ['ORG_ADMIN', 'COMPLIANCE_AUDITOR', 'MEMBER'],
+        loginAsPersona,
+        loginWithSso,
+        logout,
         switchTenant,
         switchRole,
         hasPermission,
@@ -194,5 +330,4 @@ export function useAuthTenant() {
   return context;
 }
 
-// Aliases for backward compatibility
 export const useTenant = useAuthTenant;

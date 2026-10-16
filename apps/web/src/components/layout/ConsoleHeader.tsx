@@ -41,19 +41,19 @@ export function ConsoleHeader() {
 
   const navItems = [
     {
-      href: '/copilot',
-      label: 'Copilot Console',
+      href: '/dashboard/copilot',
+      label: 'Policy Investigation',
       icon: MessageSquare,
-      badge: 'Interactive',
+      badge: 'Workstation',
     },
     {
-      href: '/documents',
+      href: '/dashboard/ingestion',
       label: 'Document Ingestion',
       icon: FileText,
       badge: 'Stage 1-4',
     },
     {
-      href: '/audit',
+      href: '/dashboard/audit',
       label: 'Compliance & PII Audit',
       icon: ClipboardList,
       badge: 'Audit Trail',
@@ -91,7 +91,7 @@ export function ConsoleHeader() {
       <div className="px-4 h-14 flex items-center justify-between gap-4">
         {/* Left: Brand & Navigation */}
         <div className="flex items-center gap-6">
-          <Link href="/copilot" className="flex items-center gap-2.5 group">
+          <Link href="/dashboard/copilot" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center font-mono font-black text-xs text-cyan-400 shadow-inner group-hover:border-cyan-500 transition-colors">
               LG
             </div>
