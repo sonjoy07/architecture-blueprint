@@ -34,7 +34,7 @@ interface TelemetryMeta {
   tokensGenerated: number;
   vectorAlgorithm: string;
   evalModel: string;
-  shardPartition: string;
+  shardPartition?: string;
 }
 
 // Tenant-specific initial greetings and suggested queries
@@ -373,7 +373,7 @@ export function CopilotView() {
         tokensGenerated: tokenCount,
         vectorAlgorithm: 'pgvector HNSW (cosine)',
         evalModel: 'RRF Cross-Encoder (Dense + Sparse)',
-        shardPartition: currentTenant.shardId,
+        shardPartition: currentTenant.shardId || 'shard-us-east-4a',
       });
 
       setConversationsByTenant((prev) => ({
@@ -461,7 +461,7 @@ export function CopilotView() {
       tokensGenerated: accumulatedText.split(' ').length,
       vectorAlgorithm: 'pgvector HNSW (cosine metric)',
       evalModel: 'Reciprocal Rank Fusion (k=60)',
-      shardPartition: currentTenant.shardId,
+      shardPartition: currentTenant.shardId || 'shard-us-east-4a',
     });
 
     setConversationsByTenant((prev) => ({
@@ -604,7 +604,7 @@ export function CopilotView() {
           <div className="flex items-center gap-1.5 text-slate-300">
             <Lock className="w-3.5 h-3.5 text-cyan-400" />
             <span className="text-slate-400">BOUND_SHARD:</span>
-            <span className="text-cyan-400 font-semibold">{currentTenant.shardId}</span>
+            <span className="text-cyan-400 font-semibold">{currentTenant.shardId || 'shard-us-east-4a'}</span>
           </div>
           <span className="text-slate-700">|</span>
           <div className="flex items-center gap-1.5 text-slate-400 hidden sm:flex">

@@ -81,7 +81,7 @@ export function ConsoleHeader() {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-slate-500 hidden md:inline">SHARD: {currentTenant.shardId}</span>
+          <span className="text-slate-500 hidden md:inline">SHARD: {currentTenant.shardId || 'shard-us-east-4a'}</span>
           <span className="text-slate-700 hidden md:inline">|</span>
           <span className="text-slate-400 font-medium">{utcTime || '00:00:00 UTC'}</span>
         </div>
