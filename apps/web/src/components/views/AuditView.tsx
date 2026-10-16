@@ -198,8 +198,8 @@ export function AuditView() {
       tenantId: currentTenant.id,
       tenantName: currentTenant.name,
       compliancePlan: currentTenant.plan,
-      verifiedBy: user.email,
-      role: user.role,
+      verifiedBy: user?.email || 'compliance.auditor@lexiguard.internal',
+      role: user?.role || 'COMPLIANCE_AUDITOR',
       ledgerHash: `sha256:0x${Math.random().toString(16).substring(2, 10)}${Math.random().toString(16).substring(2, 10)}`,
       events: filteredLogs,
     };
@@ -235,7 +235,7 @@ export function AuditView() {
           </div>
 
           <p className="text-slate-300 text-xs mb-4 leading-relaxed font-sans">
-            Your current assigned enterprise role <span className="text-red-400 font-mono font-bold">[{user.role}]</span> has zero authorization to access the cryptographic PII scrubbing ledger or compliance event tables. This view requires the <code className="bg-slate-950 px-1 py-0.5 rounded border border-slate-700 text-cyan-400">audit:read</code> permission.
+            Your current assigned enterprise role <span className="text-red-400 font-mono font-bold">[{user?.role || 'MEMBER'}]</span> has zero authorization to access the cryptographic PII scrubbing ledger or compliance event tables. This view requires the <code className="bg-slate-950 px-1 py-0.5 rounded border border-slate-700 text-cyan-400">audit:read</code> permission.
           </p>
 
           <div className="bg-slate-950 p-3 rounded border border-slate-800 mb-5 space-y-1.5 text-[11px]">
@@ -245,7 +245,7 @@ export function AuditView() {
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Assigned Identity:</span>
-              <span className="text-slate-200">{user.email}</span>
+              <span className="text-slate-200">{user?.email || 'anonymous-session'}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Authorized Roles:</span>

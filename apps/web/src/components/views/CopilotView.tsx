@@ -301,7 +301,7 @@ export function CopilotView() {
         headers: {
           Accept: 'text/event-stream',
           'x-tenant-id': currentTenant.id,
-          'x-user-role': user.role,
+          'x-user-role': user ? user.role : 'MEMBER',
         },
         signal: abortControllerRef.current.signal,
       });
@@ -552,7 +552,7 @@ export function CopilotView() {
           </div>
 
           <p className="text-slate-300 text-xs mb-4 leading-relaxed font-sans">
-            Your current assigned enterprise role <span className="text-amber-300 font-mono font-bold">[{user.role}]</span> is restricted exclusively to compliance inspection and audit trail verification. Interactive query dispatch against the knowledge copilot requires the <code className="bg-slate-950 px-1 py-0.5 rounded border border-slate-700 text-cyan-400">copilot:query</code> permission.
+            Your current assigned enterprise role <span className="text-amber-300 font-mono font-bold">[{user?.role || 'MEMBER'}]</span> is restricted exclusively to compliance inspection and audit trail verification. Interactive query dispatch against the knowledge copilot requires the <code className="bg-slate-950 px-1 py-0.5 rounded border border-slate-700 text-cyan-400">copilot:query</code> permission.
           </p>
 
           <div className="bg-slate-950 p-3 rounded border border-slate-800 mb-5 space-y-1.5 text-[11px]">
@@ -562,7 +562,7 @@ export function CopilotView() {
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Assigned Identity:</span>
-              <span className="text-slate-200">{user.email}</span>
+              <span className="text-slate-200">{user?.email || 'anonymous-session'}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Required Capability:</span>
@@ -662,7 +662,7 @@ export function CopilotView() {
                 {/* Message Header */}
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-2 border-b border-slate-800/60 pb-1">
                   <span className="font-semibold uppercase tracking-wider text-slate-400">
-                    {isUser ? user.name : 'LexiGuard Kernel // Ingestion Partition'}
+                    {isUser ? user?.name || 'User' : 'LexiGuard Kernel // Ingestion Partition'}
                   </span>
                   <span>{msg.timestamp}</span>
                 </div>
@@ -700,7 +700,7 @@ export function CopilotView() {
 
               {isUser && (
                 <div className="w-7 h-7 rounded bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 flex-shrink-0 mt-0.5 font-bold text-[10px]">
-                  {user.avatarText}
+                  {user?.avatarText || 'U'}
                 </div>
               )}
             </div>

@@ -210,17 +210,17 @@ export function ConsoleHeader() {
             >
               <div
                 className={`w-2 h-2 rounded-full ${
-                  user.role === 'ORG_ADMIN'
+                  user?.role === 'ORG_ADMIN'
                     ? 'bg-emerald-400'
-                    : user.role === 'COMPLIANCE_AUDITOR'
+                    : user?.role === 'COMPLIANCE_AUDITOR'
                     ? 'bg-amber-400'
                     : 'bg-cyan-400'
                 }`}
               />
               <div className="text-left flex flex-col">
-                <span className="font-bold text-slate-100">{user.role}</span>
+                <span className="font-bold text-slate-100">{user?.role || 'MEMBER'}</span>
                 <span className="text-[9px] text-slate-400 truncate max-w-[110px] sm:max-w-[130px]">
-                  {user.name}
+                  {user?.name || 'Authorized Session'}
                 </span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-500 ml-0.5" />
@@ -233,7 +233,7 @@ export function ConsoleHeader() {
                 </div>
                 <div className="py-1">
                   {availableRoles.map((roleKey) => {
-                    const isSelected = user.role === roleKey;
+                    const isSelected = user?.role === roleKey;
                     const def = ROLE_DEFINITIONS[roleKey];
                     return (
                       <button

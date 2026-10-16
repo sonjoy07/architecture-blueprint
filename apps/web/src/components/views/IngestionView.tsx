@@ -313,7 +313,7 @@ export function IngestionView() {
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-slate-500 uppercase">Actor:</span>
           <span className="text-[11px] font-bold text-slate-300 bg-slate-900 px-2 py-1 rounded border border-slate-800">
-            {user.name} ({user.role})
+            {user?.name || 'Authorized Session'} ({user?.role || 'MEMBER'})
           </span>
         </div>
       </div>
@@ -326,7 +326,7 @@ export function IngestionView() {
             <span>403 Forbidden: Insufficient Tenant Permissions</span>
           </div>
           <p className="text-xs text-rose-200/80 font-sans leading-relaxed">
-            Your current assigned role (<code>{user.role}</code>) lacks write authorization (<code>documents:write</code>) on partition{' '}
+            Your current assigned role (<code>{user?.role || 'MEMBER'}</code>) lacks write authorization (<code>documents:write</code>) on partition{' '}
             <strong className="text-white">{currentTenant.id}</strong>. Ingestion triggers, file deletion, and direct index mutations are restricted strictly to{' '}
             <strong>Organization Administrators (<code>ORG_ADMIN</code>)</strong>.
           </p>
