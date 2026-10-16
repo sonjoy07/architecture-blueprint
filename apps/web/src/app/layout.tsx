@@ -1,21 +1,19 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Roboto, Roboto_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import { AuthTenantProvider } from '../context/AuthTenantContext';
 import { TenantProvider } from '../lib/tenant-context';
 import { AuthProvider } from '../lib/auth-context';
 
-const roboto = Roboto({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
-  variable: '--font-roboto',
+  variable: '--font-inter',
   display: 'swap',
 });
 
-const robotoMono = Roboto_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-roboto-mono',
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
@@ -33,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`light ${roboto.variable} ${robotoMono.variable} bg-[#F8FAFC] text-[#0F172A]`}
+      className={`light ${inter.variable} ${jetbrainsMono.variable} bg-[#F8FAFC] text-[#0F172A]`}
     >
       <body className="antialiased bg-[#F8FAFC] text-[#0F172A] selection:bg-[#2563EB]/20 selection:text-[#0F172A] min-h-screen font-sans">
         <AuthTenantProvider>
