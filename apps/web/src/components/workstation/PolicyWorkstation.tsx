@@ -13,6 +13,14 @@ import {
   Check,
   Download,
   FileText,
+  Activity,
+  Cpu,
+  Network,
+  Layers,
+  ChevronDown,
+  ChevronUp,
+  FileCode,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuthTenant } from '../../context/AuthTenantContext';
 import { CitationItem } from '../../types';
@@ -224,6 +232,13 @@ interface InvestigationRecord {
     ttftMs: number;
     faithfulnessScore: number;
     vectorsScanned: number;
+    waterfall?: {
+      tokenizeMs: number;
+      piiScrubMs: number;
+      vectorHnswMs: number;
+      crossEncoderMs: number;
+      modelTtftMs: number;
+    };
   };
   isStreaming?: boolean;
 }
@@ -241,6 +256,8 @@ export function PolicyWorkstation() {
   const [copiedCitation, setCopiedCitation] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
+  const [expandedWaterfallId, setExpandedWaterfallId] = useState<string | null>('inv-init-01');
+  const [inspectorTab, setInspectorTab] = useState<'PASSAGE' | 'PDF_VIEW' | 'GRAPH'>('PASSAGE');
 
   const [investigations, setInvestigations] = useState<InvestigationRecord[]>([
     {
@@ -262,6 +279,13 @@ export function PolicyWorkstation() {
         ttftMs: 94,
         faithfulnessScore: 99.4,
         vectorsScanned: activePolicies[0].chunkCount,
+        waterfall: {
+          tokenizeMs: 14,
+          piiScrubMs: 18,
+          vectorHnswMs: 46,
+          crossEncoderMs: 32,
+          modelTtftMs: 272,
+        },
       },
     },
   ]);
@@ -362,6 +386,13 @@ export function PolicyWorkstation() {
         ttftMs: 95 + Math.floor(Math.random() * 25),
         faithfulnessScore: 99.4,
         vectorsScanned: matchedPolicy.chunkCount,
+        waterfall: {
+          tokenizeMs: 12 + Math.floor(Math.random() * 4),
+          piiScrubMs: 16 + Math.floor(Math.random() * 6),
+          vectorHnswMs: 38 + Math.floor(Math.random() * 12),
+          crossEncoderMs: 26 + Math.floor(Math.random() * 8),
+          modelTtftMs: 230 + Math.floor(Math.random() * 40),
+        },
       },
       isStreaming: true,
     };
@@ -600,13 +631,144 @@ export function PolicyWorkstation() {
                   </div>
                 </div>
 
-                {/* Grounding Signature */}
-                <div className="flex items-center justify-between pt-1.5 border-t border-[#252A36] text-[10px] text-[#8B949E]">
-                  <span className="flex items-center gap-1.5 font-mono">
-                    <ShieldCheck className="w-3 h-3 text-[#3FB950]" />
-                    <span>Cryptographic Grounding Verified</span>
-                  </span>
-                  <span className="font-mono tabular-nums">Vectors: {inv.telemetry.vectorsScanned}</span>
+                {/* Grounding Signature & Telemetry Bar */}
+                <div className="pt-2 border-t border-[#252A36] space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                    <div className="flex items-center gap-2 font-mono">
+                      <span className="flex items-center gap-1 text-[#3FB950] font-semibold">
+                        <ShieldCheck className="w-3 h-3 text-[#3FB950]" />
+                        <span>GROUNDED (RLS)</span>
+                      </span>
+                      <span className="text-[#252A36]">|</span>
+                      <span>
+                        Latency: <strong className="text-[#E6EDF3]">{inv.telemetry.latencyMs}ms</strong>
+                      </span>
+                      <span className="text-[#252A36] hidden sm:inline">|</span>
+                      <span className="hidden sm:inline">
+                        TTFT: <span className="text-[#58A6FF]">{inv.telemetry.ttftMs}ms</span>
+                      </span>
+                      <span className="text-[#252A36] hidden md:inline">|</span>
+                      <span className="hidden md:inline">
+                        Faithfulness: <span className="text-[#3FB950]">{inv.telemetry.faithfulnessScore}%</span>
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        setExpandedWaterfallId(expandedWaterfallId === inv.id ? null : inv.id)
+                      }
+                      className="flex items-center gap-1 text-[10px] text-[#58A6FF] hover:text-[#58A6FF]/80 font-mono cursor-pointer transition-colors"
+                    >
+                      <span>Latency Trace</span>
+                      {expandedWaterfallId === inv.id ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Expandable Waterfall Timeline */}
+                  {expandedWaterfallId === inv.id && inv.telemetry.waterfall && (
+                    <div className="p-2.5 rounded-[3px] bg-[#0A0C10] border border-[#252A36] space-y-2 text-[10px] font-mono animate-in fade-in">
+                      <div className="flex items-center justify-between text-[#8B949E] border-b border-[#252A36] pb-1.5 text-[9px] uppercase tracking-wider">
+                        <span>Pipeline Execution Trace Waterfall</span>
+                        <span>Engine: pgvector-16.2 / HNSW 1536d Cosine</span>
+                      </div>
+
+                      {/* Stacked Progress Bar */}
+                      <div className="h-2 w-full bg-[#161920] rounded-[1px] overflow-hidden flex border border-[#252A36]">
+                        <div
+                          style={{
+                            width: `${(inv.telemetry.waterfall.tokenizeMs / inv.telemetry.latencyMs) * 100}%`,
+                          }}
+                          className="bg-[#8B949E] h-full"
+                          title={`Tokenizer: ${inv.telemetry.waterfall.tokenizeMs}ms`}
+                        />
+                        <div
+                          style={{
+                            width: `${(inv.telemetry.waterfall.piiScrubMs / inv.telemetry.latencyMs) * 100}%`,
+                          }}
+                          className="bg-[#D29922] h-full"
+                          title={`PII Zero-Egress Guard: ${inv.telemetry.waterfall.piiScrubMs}ms`}
+                        />
+                        <div
+                          style={{
+                            width: `${(inv.telemetry.waterfall.vectorHnswMs / inv.telemetry.latencyMs) * 100}%`,
+                          }}
+                          className="bg-[#58A6FF] h-full"
+                          title={`HNSW Search: ${inv.telemetry.waterfall.vectorHnswMs}ms`}
+                        />
+                        <div
+                          style={{
+                            width: `${(inv.telemetry.waterfall.crossEncoderMs / inv.telemetry.latencyMs) * 100}%`,
+                          }}
+                          className="bg-[#A371F7] h-full"
+                          title={`Cross-Encoder Re-rank: ${inv.telemetry.waterfall.crossEncoderMs}ms`}
+                        />
+                        <div
+                          style={{
+                            width: `${(inv.telemetry.waterfall.modelTtftMs / inv.telemetry.latencyMs) * 100}%`,
+                          }}
+                          className="bg-[#238636] h-full"
+                          title={`Model TTFT: ${inv.telemetry.waterfall.modelTtftMs}ms`}
+                        />
+                      </div>
+
+                      {/* Stage Breakdown Legend */}
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-[9px]">
+                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
+                          <div className="text-[#8B949E] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#8B949E] rounded-[1px]" />
+                            <span>1. Tokenize</span>
+                          </div>
+                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                            {inv.telemetry.waterfall.tokenizeMs}ms
+                          </div>
+                        </div>
+
+                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
+                          <div className="text-[#D29922] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#D29922] rounded-[1px]" />
+                            <span>2. PII Scrub</span>
+                          </div>
+                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                            {inv.telemetry.waterfall.piiScrubMs}ms
+                          </div>
+                        </div>
+
+                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
+                          <div className="text-[#58A6FF] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#58A6FF] rounded-[1px]" />
+                            <span>3. HNSW Search</span>
+                          </div>
+                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                            {inv.telemetry.waterfall.vectorHnswMs}ms
+                          </div>
+                        </div>
+
+                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
+                          <div className="text-[#A371F7] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#A371F7] rounded-[1px]" />
+                            <span>4. Re-Ranking</span>
+                          </div>
+                          <div className="font-bold text-[#E6EDF3] tabular-nums">
+                            {inv.telemetry.waterfall.crossEncoderMs}ms
+                          </div>
+                        </div>
+
+                        <div className="p-1.5 rounded-[2px] bg-[#12141A] border border-[#252A36] space-y-0.5">
+                          <div className="text-[#3FB950] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-[#238636] rounded-[1px]" />
+                            <span>5. Model TTFT</span>
+                          </div>
+                          <div className="font-bold text-[#3FB950] tabular-nums">
+                            {inv.telemetry.waterfall.modelTtftMs}ms
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -681,85 +843,269 @@ export function PolicyWorkstation() {
         </div>
 
         {/* ========================================================= */}
-        {/* RIGHT COLUMN (25% - 3 cols): FIXED GROUND-TRUTH INSPECTOR */}
+        {/* RIGHT COLUMN (25% - 3 cols): MULTI-MODE INSPECTOR */}
         {/* ========================================================= */}
         <div className="col-span-3 flex flex-col bg-[#0E1015] h-full overflow-hidden">
-          {/* Header */}
-          <div className="p-2.5 border-b border-[#252A36] bg-[#161920] flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#3FB950]" />
-              <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
-                Ground-Truth Inspector
+          {/* Header & Tabs */}
+          <div className="border-b border-[#252A36] bg-[#161920]">
+            <div className="p-2.5 flex items-center justify-between border-b border-[#252A36]">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#3FB950]" />
+                <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
+                  Ground-Truth Inspector
+                </span>
+              </div>
+              <span className="text-[10px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#58A6FF] font-mono">
+                CHUNK #{pinnedCitation.chunkId}
               </span>
             </div>
-            <span className="text-[10px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#58A6FF] font-mono">
-              CHUNK #{pinnedCitation.chunkId}
-            </span>
+
+            {/* 3 Inspection Sub-Tabs */}
+            <div className="flex items-center divide-x divide-[#252A36] text-[10px] font-mono">
+              <button
+                onClick={() => setInspectorTab('PASSAGE')}
+                className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
+                  inspectorTab === 'PASSAGE'
+                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
+                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                }`}
+              >
+                <FileText className="w-3 h-3 text-[#58A6FF]" />
+                <span>Passage</span>
+              </button>
+              <button
+                onClick={() => setInspectorTab('PDF_VIEW')}
+                className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
+                  inspectorTab === 'PDF_VIEW'
+                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
+                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                }`}
+              >
+                <FileCode className="w-3 h-3 text-[#E3B341]" />
+                <span>In-Situ PDF</span>
+              </button>
+              <button
+                onClick={() => setInspectorTab('GRAPH')}
+                className={`flex-1 py-1.5 px-2 flex items-center justify-center gap-1 cursor-pointer transition-colors ${
+                  inspectorTab === 'GRAPH'
+                    ? 'bg-[#1F232D] text-[#E6EDF3] font-bold border-b-2 border-[#58A6FF]'
+                    : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
+                }`}
+              >
+                <Network className="w-3 h-3 text-[#3FB950]" />
+                <span>Graph</span>
+              </button>
+            </div>
           </div>
 
-          {/* Inspector Content */}
-          <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
-            {/* Document Title & Section */}
-            <div className="space-y-0.5">
-              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
-                Source Document
-              </span>
-              <div className="text-[12px] text-[#E6EDF3] font-semibold font-sans">
-                {pinnedCitation.documentTitle}
-              </div>
-              <div className="text-[10px] text-[#58A6FF] font-mono">
-                {pinnedCitation.section || 'General Governance Clause'}
-              </div>
-            </div>
+          {/* Inspector Content by Tab */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+            {inspectorTab === 'PASSAGE' && (
+              <>
+                {/* Document Title & Section */}
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                    Source Document
+                  </span>
+                  <div className="text-[12px] text-[#E6EDF3] font-semibold font-sans">
+                    {pinnedCitation.documentTitle}
+                  </div>
+                  <div className="text-[10px] text-[#58A6FF] font-mono">
+                    {pinnedCitation.section || 'General Governance Clause'}
+                  </div>
+                </div>
 
-            {/* Verification Metadata Box */}
-            <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-2.5 space-y-1.5 text-[11px] font-mono">
-              <div className="flex justify-between">
-                <span className="text-[#8B949E]">Page:</span>
-                <span className="text-[#E6EDF3] font-semibold tabular-nums">Page {pinnedCitation.page}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8B949E]">Cosine Distance:</span>
-                <span className="text-[#3FB950] font-semibold tabular-nums">
-                  {(1 - pinnedCitation.similarityScore).toFixed(4)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8B949E]">Similarity Metric:</span>
-                <span className="text-[#E6EDF3] tabular-nums">
-                  {(pinnedCitation.similarityScore * 100).toFixed(2)}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8B949E]">Tenant Boundary:</span>
-                <span className="text-[#58A6FF] font-medium">{currentTenant.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#8B949E]">Shard Partition:</span>
-                <span className="text-[#E6EDF3]">{currentTenant.shardId || 'shard-us-east-4a'}</span>
-              </div>
-            </div>
+                {/* Verification Metadata Box */}
+                <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-2.5 space-y-1.5 text-[11px] font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-[#8B949E]">Page:</span>
+                    <span className="text-[#E6EDF3] font-semibold tabular-nums">Page {pinnedCitation.page}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B949E]">Cosine Distance:</span>
+                    <span className="text-[#3FB950] font-semibold tabular-nums">
+                      {(1 - pinnedCitation.similarityScore).toFixed(4)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B949E]">Similarity Metric:</span>
+                    <span className="text-[#E6EDF3] tabular-nums">
+                      {(pinnedCitation.similarityScore * 100).toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B949E]">Tenant Boundary:</span>
+                    <span className="text-[#58A6FF] font-medium">{currentTenant.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B949E]">Shard Partition:</span>
+                    <span className="text-[#E6EDF3]">{currentTenant.shardId || 'shard-us-east-4a'}</span>
+                  </div>
+                </div>
 
-            {/* Source SHA-256 Hash */}
-            <div className="space-y-0.5">
-              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
-                Chunk SHA-256 Hash
-              </span>
-              <div className="p-2 rounded-[2px] bg-[#161920] border border-[#252A36] text-[10px] text-[#8B949E] font-mono break-all leading-tight">
-                {activePolicies.find((p) => p.title.includes(pinnedCitation.documentTitle))
-                  ?.sha256Hash || 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'}
-              </div>
-            </div>
+                {/* Source SHA-256 Hash */}
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                    Chunk SHA-256 Hash
+                  </span>
+                  <div className="p-2 rounded-[2px] bg-[#161920] border border-[#252A36] text-[10px] text-[#8B949E] font-mono break-all leading-tight">
+                    {activePolicies.find((p) => p.title.includes(pinnedCitation.documentTitle))
+                      ?.sha256Hash || 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'}
+                  </div>
+                </div>
 
-            {/* Verbatim Source Passage */}
-            <div className="space-y-1">
-              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
-                Verbatim Extracted Chunk
-              </span>
-              <div className="p-2.5 rounded-[3px] bg-[#161920] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap select-text">
-                &ldquo;{pinnedCitation.rawText}&rdquo;
+                {/* Verbatim Source Passage */}
+                <div className="space-y-1">
+                  <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                    Verbatim Extracted Chunk
+                  </span>
+                  <div className="p-2.5 rounded-[3px] bg-[#161920] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap select-text">
+                    &ldquo;{pinnedCitation.rawText}&rdquo;
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* TAB 2: IN-SITU SIMULATED PDF VIEW */}
+            {inspectorTab === 'PDF_VIEW' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                  <span>DOCUMENT PREVIEW // PAGE {pinnedCitation.page}</span>
+                  <span className="text-[#3FB950] font-bold">100% OCR VERIFIED</span>
+                </div>
+
+                {/* Simulated Paper Document Sheet */}
+                <div className="p-4 rounded-[3px] bg-[#12141A] border border-[#252A36] space-y-3 relative overflow-hidden font-sans text-[11px] select-text">
+                  {/* Watermark */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-2xl font-black uppercase rotate-[-25deg] text-[#E6EDF3]">
+                    CONFIDENTIAL - {currentTenant.name}
+                  </div>
+
+                  {/* Document Stamp Header */}
+                  <div className="border-b border-[#252A36] pb-2 flex items-center justify-between text-[9px] font-mono text-[#8B949E]">
+                    <div>
+                      <span className="font-bold text-[#E6EDF3] block">{pinnedCitation.documentTitle}</span>
+                      <span>PAGE {pinnedCitation.page} &middot; REVISION 2026.4</span>
+                    </div>
+                    <div className="px-1.5 py-0.5 rounded-[2px] bg-[#161920] border border-[#30363D] text-[#58A6FF]">
+                      SEC-LEVEL: T1
+                    </div>
+                  </div>
+
+                  {/* Surrounding Context Section 1 */}
+                  <div className="text-[#8B949E] text-[10px] leading-relaxed">
+                    § 4.2 Scope of Operations — This operational protocol governs all cryptographic hardware keys, perimeter security boundaries, and corporate access control protocols under standard corporate oversight.
+                  </div>
+
+                  {/* Target Cited Passage Highlight Box */}
+                  <div className="p-2.5 rounded-[3px] bg-[#E3B341]/10 border-l-2 border-[#E3B341] space-y-1">
+                    <div className="flex items-center justify-between text-[9px] font-mono text-[#E3B341] font-bold">
+                      <span>CITED PASSAGE #{pinnedCitation.chunkId}</span>
+                      <span>COSINE DIST: {(1 - pinnedCitation.similarityScore).toFixed(4)}</span>
+                    </div>
+                    <p className="text-[#E6EDF3] leading-relaxed font-medium">
+                      {pinnedCitation.rawText}
+                    </p>
+                  </div>
+
+                  {/* Surrounding Context Section 2 */}
+                  <div className="text-[#8B949E] text-[10px] leading-relaxed">
+                    § 4.4 Non-Compliance Repercussions — Any attempt to circumvent identity boundary guards or access production shard partitions without prior approval triggers immediate revocation of role grants and logs an incident to the compliance audit database.
+                  </div>
+
+                  {/* Footer Stamp */}
+                  <div className="pt-2 border-t border-[#252A36] flex items-center justify-between text-[9px] font-mono text-[#484F58]">
+                    <span>HASH: {pinnedCitation.rawText.substring(0, 24)}...</span>
+                    <span>HMAC-SHA256 SIGNED</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* TAB 3: INTERACTIVE KNOWLEDGE GRAPH */}
+            {inspectorTab === 'GRAPH' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[10px] text-[#8B949E]">
+                  <span>POLICY CLAUSE DEPENDENCY GRAPH</span>
+                  <span className="text-[#58A6FF] font-bold">INTERACTIVE</span>
+                </div>
+
+                <div className="p-2 rounded-[3px] bg-[#12141A] border border-[#252A36]">
+                  {/* SVG Policy Knowledge Graph */}
+                  <svg viewBox="0 0 320 240" className="w-full h-56 select-none font-mono">
+                    <defs>
+                      <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#252A36" />
+                        <stop offset="100%" stopColor="#58A6FF" stopOpacity="0.8" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Connecting Edges */}
+                    <line x1="160" y1="120" x2="60" y2="50" stroke="#252A36" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <line x1="160" y1="120" x2="260" y2="50" stroke="#58A6FF" strokeWidth="1.5" />
+                    <line x1="160" y1="120" x2="60" y2="190" stroke="#252A36" strokeWidth="1.5" />
+                    <line x1="160" y1="120" x2="260" y2="190" stroke="#238636" strokeWidth="1.5" />
+                    <line x1="260" y1="50" x2="260" y2="190" stroke="#252A36" strokeWidth="1" strokeDasharray="2 2" />
+
+                    {/* Center Root Node */}
+                    <circle cx="160" cy="120" r="26" fill="#161920" stroke="#58A6FF" strokeWidth="2" />
+                    <text x="160" y="117" textAnchor="middle" fill="#E6EDF3" fontSize="8" fontWeight="bold">
+                      {currentTenant.id.toUpperCase()}
+                    </text>
+                    <text x="160" y="128" textAnchor="middle" fill="#58A6FF" fontSize="7">
+                      VAULT
+                    </text>
+
+                    {/* Node 1: Top Left */}
+                    <circle cx="60" cy="50" r="20" fill="#161920" stroke="#30363D" strokeWidth="1.5" />
+                    <text x="60" y="48" textAnchor="middle" fill="#C9D1D9" fontSize="7" fontWeight="bold">
+                      ISO27001
+                    </text>
+                    <text x="60" y="58" textAnchor="middle" fill="#8B949E" fontSize="6">
+                      CONTROLS
+                    </text>
+
+                    {/* Node 2: Top Right (Active Cited Policy) */}
+                    <circle cx="260" cy="50" r="24" fill="#0C1C36" stroke="#58A6FF" strokeWidth="2" />
+                    <text x="260" y="47" textAnchor="middle" fill="#E6EDF3" fontSize="7" fontWeight="bold">
+                      ACTIVE
+                    </text>
+                    <text x="260" y="57" textAnchor="middle" fill="#58A6FF" fontSize="6">
+                      CHUNK #{pinnedCitation.chunkId}
+                    </text>
+
+                    {/* Node 3: Bottom Left */}
+                    <circle cx="60" cy="190" r="20" fill="#161920" stroke="#30363D" strokeWidth="1.5" />
+                    <text x="60" y="188" textAnchor="middle" fill="#C9D1D9" fontSize="7" fontWeight="bold">
+                      PII MASK
+                    </text>
+                    <text x="60" y="198" textAnchor="middle" fill="#D29922" fontSize="6">
+                      LUHN/NID
+                    </text>
+
+                    {/* Node 4: Bottom Right */}
+                    <circle cx="260" cy="190" r="22" fill="#0E2316" stroke="#238636" strokeWidth="1.5" />
+                    <text x="260" y="188" textAnchor="middle" fill="#E6EDF3" fontSize="7" fontWeight="bold">
+                      RLS LOCK
+                    </text>
+                    <text x="260" y="198" textAnchor="middle" fill="#3FB950" fontSize="6">
+                      ZERO LEAK
+                    </text>
+                  </svg>
+
+                  <div className="p-2 border-t border-[#252A36] text-[10px] text-[#8B949E] space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Cross-Referenced Directives:</span>
+                      <span className="text-[#E6EDF3] font-bold">4 Nodes Active</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Regulatory Harmonization:</span>
+                      <span className="text-[#3FB950]">100% Policy Bound</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Footer */}

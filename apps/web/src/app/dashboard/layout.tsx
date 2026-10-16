@@ -14,6 +14,7 @@ import {
   User,
 } from 'lucide-react';
 import { useAuthTenant } from '../../context/AuthTenantContext';
+import { CommandPalette } from '../../components/layout/CommandPalette';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -83,8 +84,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </span>
           <span className="text-[#252A36] hidden md:inline">|</span>
           <span className="text-[#8B949E]">SESSION: {user?.id || 'ANON'}</span>
+          <span className="text-[#252A36]">|</span>
+          <button
+            onClick={() => {
+              window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+            }}
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#161920] border border-[#252A36] hover:border-[#58A6FF]/60 hover:text-[#E6EDF3] text-[#8B949E] text-[10px] cursor-pointer transition-colors"
+            title="Open Universal Command Palette (Ctrl+K)"
+          >
+            <span>Command Bar</span>
+            <kbd className="px-1 py-0.2 rounded-[1px] bg-[#0E1015] text-[9px] text-[#58A6FF] font-bold">
+              ⌘K
+            </kbd>
+          </button>
         </div>
       </div>
+
+      <CommandPalette />
 
       {/* Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden">
