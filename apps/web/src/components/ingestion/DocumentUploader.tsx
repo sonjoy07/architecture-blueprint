@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   UploadCloud,
   FileText,
@@ -229,7 +229,40 @@ const INITIAL_DOCUMENTS: IngestedDocument[] = [
 
 export function DocumentUploader() {
   const { currentTenant, getApiHeaders } = useTenant();
-  const [documents, setDocuments] = useState<IngestedDocument[]>(INITIAL_DOCUMENTS);
+  const [documents, setDocuments] = useState<IngestedDocument[]>(() => {
+    try {
+      const stored = localStorage.getItem('app.custom_documents');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return [...parsed, ...INITIAL_DOCUMENTS];
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return INITIAL_DOCUMENTS;
+  });
+
+  // Re-sync with localStorage when currentTenant switches
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('app.custom_documents');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const customIds = new Set(parsed.map((d: any) => d.id));
+          setDocuments((prev) => [
+            ...parsed,
+            ...INITIAL_DOCUMENTS.filter((d) => !customIds.has(d.id)),
+          ]);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [currentTenant]);
+
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedAuditDoc, setSelectedAuditDoc] = useState<IngestedDocument | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -325,7 +358,16 @@ export function DocumentUploader() {
       createdAt: new Date().toISOString(),
     };
 
-    setDocuments((prev) => [newDoc, ...prev]);
+    setDocuments((prev) => {
+      const updated = [newDoc, ...prev];
+      try {
+        const customOnly = updated.filter((d) => !INITIAL_DOCUMENTS.some((init) => init.id === d.id));
+        localStorage.setItem('app.custom_documents', JSON.stringify(customOnly));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
     setActiveUpload(null);
   };
 
@@ -364,7 +406,16 @@ export function DocumentUploader() {
   };
 
   const handleDelete = (id: string) => {
-    setDocuments((prev) => prev.filter((d) => d.id !== id));
+    setDocuments((prev) => {
+      const updated = prev.filter((d) => d.id !== id);
+      try {
+        const customOnly = updated.filter((d) => !INITIAL_DOCUMENTS.some((init) => init.id === d.id));
+        localStorage.setItem('app.custom_documents', JSON.stringify(customOnly));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
   };
 
   const handleExportAuditJson = () => {

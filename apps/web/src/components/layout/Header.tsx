@@ -14,14 +14,17 @@ import {
   Lock,
   Layers,
   Info,
+  Plus,
 } from 'lucide-react';
 import { useTenant } from '../../lib/tenant-context';
+import { CreateWorkspaceModal } from './CreateWorkspaceModal';
 
 export function Header() {
   const pathname = usePathname();
   const { currentTenant, setTenant, availableTenants } = useTenant();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -197,11 +200,31 @@ export function Header() {
                     );
                   })}
                 </div>
+
+                {/* Provision New Workspace Action */}
+                <div className="p-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      setIsCreateModalOpen(true);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer border border-indigo-200/80 dark:border-indigo-800/80 shadow-2xs"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Provision New Workspace</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Provision Workspace Modal */}
+      <CreateWorkspaceModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </header>
   );
 }
