@@ -5,12 +5,12 @@ export type TenantId = 't_acme_corp' | 't_nexus_health' | string;
 export interface Tenant {
   id: TenantId;
   name: string;
-  code: string;
+  code?: string;
   plan: string;
   complianceTags: string[];
-  shardId: string;
-  vectorDimensions: number;
-  totalIndexedDocs: number;
+  shardId?: string;
+  vectorDimensions?: number;
+  totalIndexedDocs?: number;
 }
 
 export type Permission =
@@ -48,12 +48,12 @@ export interface IngestedDocument {
   title: string;
   fileType: 'PDF' | 'TXT' | 'DOCX';
   fileSize: string;
-  status: 'INDEXED' | 'INGESTING' | 'FAILED';
+  status: 'INDEXED' | 'INGESTING' | 'FAILED' | 'Indexed' | 'Processing' | 'Failed';
   chunks: number;
-  redactionStatus: 'SCRUBBED' | 'CLEAN' | 'PENDING';
+  redactionStatus: 'SCRUBBED' | 'CLEAN' | 'PENDING' | 'Scrubbed' | 'Clean' | 'Pending';
   piiAudit?: PiiAuditMetrics;
   createdAt: string;
-  sha256Hash: string;
+  sha256Hash?: string;
   lastIndexedBy?: string;
 }
 
@@ -114,14 +114,22 @@ export interface CitationChunk {
   rrfScore?: number;
 }
 
+export interface GuardrailInfo {
+  passed: boolean;
+  lexicalGroundingScore: number;
+  hallucinatedCitationsCount: number;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   citations?: CitationChunk[];
+  guardrail?: GuardrailInfo;
   timestamp: string;
   isStreaming?: boolean;
 }
 
 export type ProcessingStep = 1 | 2 | 3 | 4;
 export type IngestionStep = 'UPLOADED' | 'PII_SANITIZED' | 'EMBEDDED' | 'READY' | 'FAILED';
+export type IngestionStatus = 'UPLOADING' | 'PII_SANITIZING' | 'EMBEDDING' | 'INDEXED' | 'FAILED';
