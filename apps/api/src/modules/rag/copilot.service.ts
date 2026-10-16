@@ -132,7 +132,7 @@ export class CopilotService {
         const endpoint = isGemini
           ? 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
           : 'https://api.openai.com/v1/chat/completions';
-        const model = isGemini ? 'gemini-1.5-flash' : 'gpt-4o-mini';
+        const model = isGemini ? 'gemini-2.5-flash' : 'gpt-4o-mini';
 
         const response = await fetch(endpoint, {
           method: 'POST',

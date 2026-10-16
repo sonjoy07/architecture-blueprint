@@ -24,18 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuthTenant } from '../../context/AuthTenantContext';
 import { CitationItem } from '../../types';
-
-interface PolicyDocumentMetadata {
-  id: string;
-  code: string;
-  title: string;
-  version: string;
-  lastSynced: string;
-  chunkCount: number;
-  tag: string;
-  sha256Hash: string;
-  defaultChunk: CitationItem;
-}
+import { getTenantPolicies, PolicyDocumentMetadata } from '../../lib/policy-store';
 
 const TENANT_POLICIES: Record<string, PolicyDocumentMetadata[]> = {
   t_acme_corp: [
@@ -246,13 +235,34 @@ interface InvestigationRecord {
 export function PolicyWorkstation() {
   const { currentTenant, user } = useAuthTenant();
 
-  const activePolicies = useMemo(() => {
-    return TENANT_POLICIES[currentTenant.id] || TENANT_POLICIES['t_acme_corp'];
+  const [activePolicies, setActivePolicies] = useState<PolicyDocumentMetadata[]>(() =>
+    getTenantPolicies(currentTenant.id)
+  );
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setActivePolicies(getTenantPolicies(currentTenant.id));
+    };
+    handleUpdate();
+    window.addEventListener('tenant-policies-updated', handleUpdate);
+    return () => window.removeEventListener('tenant-policies-updated', handleUpdate);
   }, [currentTenant.id]);
 
   const [policySearch, setPolicySearch] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyDocumentMetadata | null>(null);
-  const [pinnedCitation, setPinnedCitation] = useState<CitationItem>(activePolicies[0].defaultChunk);
+  const [pinnedCitation, setPinnedCitation] = useState<CitationItem>(
+    activePolicies[0]?.defaultChunk || {
+      id: 'chunk-default',
+      documentTitle: 'Standard Policy Guide',
+      page: 1,
+      chunkId: 1,
+      section: 'Section 1.0 - Directives',
+      rawText: 'Active compliance directives loaded.',
+      similarityScore: 0.98,
+      tenantId: currentTenant.id,
+      vectorAlgorithm: 'pgvector HNSW (cosine)',
+    }
+  );
   const [copiedCitation, setCopiedCitation] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
@@ -273,12 +283,24 @@ export function PolicyWorkstation() {
         currentTenant.id === 't_acme_corp'
           ? `Pursuant to Acme Corporation Information Security Controls [REF-SEC-01], all production databases, Kubernetes clusters, and Cloud SQL instances mandate hardware-backed WebAuthn / FIDO2 multi-factor authentication.\n\nDirect SSH or bastion access is permanently disabled; engineering transit requires Zero-Trust IAP approval with 4-hour ephemeral authorization tokens [REF-SEC-01]. Ingestion filters enforce deterministic PII tokenization before vector embedding persistence.`
           : `Under Nexus Dynamics Clinical Safeguards SOP [REF-HIPAA-01], electronic Protected Health Information (ePHI) queries are governed by role-based (RBAC) and attribute-based (ABAC) boundary policies.\n\nEmergency break-glass overrides require dual-clinician confirmation and dispatch automated alerts to the compliance audit queue within 60 seconds [REF-HIPAA-01]. All events are mirrored to immutable 6-year retention storage.`,
-      citations: [activePolicies[0].defaultChunk],
+      citations: [
+        activePolicies[0]?.defaultChunk || {
+          id: 'chunk-init',
+          documentTitle: 'Security Controls',
+          page: 1,
+          chunkId: 1,
+          section: 'Section 1.0',
+          rawText: 'MFA is mandatory.',
+          similarityScore: 0.99,
+          tenantId: currentTenant.id,
+          vectorAlgorithm: 'pgvector HNSW (cosine)',
+        },
+      ],
       telemetry: {
         latencyMs: 382,
         ttftMs: 94,
         faithfulnessScore: 99.4,
-        vectorsScanned: activePolicies[0].chunkCount,
+        vectorsScanned: activePolicies[0]?.chunkCount || 100,
         waterfall: {
           tokenizeMs: 14,
           piiScrubMs: 18,
@@ -295,7 +317,9 @@ export function PolicyWorkstation() {
 
   useEffect(() => {
     setSelectedPolicy(null);
-    setPinnedCitation(activePolicies[0].defaultChunk);
+    if (activePolicies[0]?.defaultChunk) {
+      setPinnedCitation(activePolicies[0].defaultChunk);
+    }
   }, [activePolicies]);
 
   useEffect(() => {
@@ -327,51 +351,45 @@ export function PolicyWorkstation() {
     setIsExecuting(true);
     setInputQuery('');
 
-    const isAcme = currentTenant.id === 't_acme_corp';
     const qLower = trimmed.toLowerCase();
 
+    // 1. Identify best matched policy based on query semantics & keywords
     let matchedPolicy = selectedPolicy || activePolicies[0];
-    if (!selectedPolicy) {
-      if (isAcme) {
-        if (qLower.includes('travel') || qLower.includes('expense') || qLower.includes('per diem')) {
-          matchedPolicy = activePolicies.find((p) => p.code.includes('HR')) || activePolicies[1];
-        } else if (qLower.includes('fcpa') || qLower.includes('gift') || qLower.includes('bribe')) {
-          matchedPolicy = activePolicies.find((p) => p.code.includes('FCPA')) || activePolicies[4];
-        } else if (qLower.includes('pci') || qLower.includes('card') || qLower.includes('pan')) {
-          matchedPolicy = activePolicies.find((p) => p.code.includes('PCI')) || activePolicies[3];
-        } else {
-          matchedPolicy = activePolicies[0];
+    if (!selectedPolicy && activePolicies.length > 0) {
+      const qWords = qLower.split(/\s+/).filter((w) => w.length > 2);
+      let bestScore = -1;
+      for (const pol of activePolicies) {
+        let score = 0;
+        const textToSearch = (
+          (pol.title || '') +
+          ' ' +
+          (pol.code || '') +
+          ' ' +
+          (pol.tag || '') +
+          ' ' +
+          (pol.rawText || pol.defaultChunk?.rawText || '')
+        ).toLowerCase();
+        for (const w of qWords) {
+          if (textToSearch.includes(w)) score++;
         }
-      } else {
-        if (qLower.includes('retention') || qLower.includes('year') || qLower.includes('disposal')) {
-          matchedPolicy = activePolicies.find((p) => p.code.includes('HITECH')) || activePolicies[1];
-        } else if (qLower.includes('baa') || qLower.includes('vendor') || qLower.includes('cloud')) {
-          matchedPolicy = activePolicies.find((p) => p.code.includes('BAA')) || activePolicies[2];
-        } else {
-          matchedPolicy = activePolicies[0];
+        if (score > bestScore) {
+          bestScore = score;
+          matchedPolicy = pol;
         }
       }
     }
 
-    const citation = matchedPolicy.defaultChunk;
-    const citationToken = `[REF-${matchedPolicy.code.split('-')[0]}-01]`;
-
-    let generatedText = '';
-    if (isAcme) {
-      if (matchedPolicy.code.includes('HR')) {
-        generatedText = `Under Acme Global Travel & Expense Policy (${matchedPolicy.version}) ${citationToken}, employee business meals are capped at $75.00/day ($100.00/day in Tier-1 metros). Itemized digitized receipts must be uploaded within 30 calendar days via the finance portal. Alcohol is non-reimbursable without VP sign-off ${citationToken}.`;
-      } else if (matchedPolicy.code.includes('FCPA')) {
-        generatedText = `Pursuant to Acme Anti-Bribery Directives ${citationToken}, any gift, gratuity, or hospitality extended to foreign commercial or government partners exceeding $50.00 USD must be logged in the Global Ethics Ledger and pre-cleared by Corporate Legal ${citationToken}.`;
-      } else {
-        generatedText = `According to ${matchedPolicy.title} (${matchedPolicy.version}) ${citationToken}, production infrastructure access mandates hardware-backed WebAuthn / FIDO2 MFA credentials. Bastion SSH is restricted, and engineering sessions operate under 4-hour ephemeral IAP role leases ${citationToken}.`;
-      }
-    } else {
-      if (matchedPolicy.code.includes('HITECH')) {
-        generatedText = `Under Nexus Dynamics Patient Privacy & Retention SOP ${citationToken}, clinical trial documentation, patient ledgers, and consent disclosures must be preserved for 7 continuous years post-discharge. Cryptographic key-shredding is required for decommissioned media ${citationToken}.`;
-      } else {
-        generatedText = `Pursuant to Nexus Dynamics Clinical Safeguards (${matchedPolicy.version}) ${citationToken}, electronic PHI retrieval is restricted to authorized clinicians with current clinical assignments. Emergency break-glass actions trigger real-time compliance ledger events ${citationToken}.`;
-      }
-    }
+    const citation: CitationItem = matchedPolicy.defaultChunk || {
+      id: `chunk-${matchedPolicy.id}-01`,
+      documentTitle: matchedPolicy.title,
+      page: 1,
+      chunkId: 1,
+      section: 'Section 1.0 - Operational Policy Directive',
+      rawText: matchedPolicy.rawText?.slice(0, 400) || 'Verified policy directive in vault.',
+      similarityScore: 0.985,
+      tenantId: currentTenant.id,
+      vectorAlgorithm: 'pgvector HNSW (cosine)',
+    };
 
     const invId = `inv-${Date.now().toString(36)}`;
     const newRecord: InvestigationRecord = {
@@ -403,84 +421,176 @@ export function PolicyWorkstation() {
     let streamSucceeded = false;
     let accumulatedText = '';
 
+    // Step 1: Call Next.js App Router /api/copilot (has direct GEMINI_API_KEY access and passes all dynamic documents)
     try {
-      const apiUrl =
-        process.env.NEXT_PUBLIC_API_URL ||
-        (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
-      const response = await fetch(
-        `${apiUrl}/api/v1/copilot/stream?query=${encodeURIComponent(trimmed)}`,
-        {
-          headers: {
-            Accept: 'text/event-stream',
-            'x-tenant-id': currentTenant.id,
-          },
-        }
-      );
+      const res = await fetch('/api/copilot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: trimmed,
+          tenantId: currentTenant.id,
+          documents: activePolicies.map((p) => ({
+            title: p.title,
+            code: p.code,
+            rawText: p.rawText || p.defaultChunk.rawText,
+            section: p.defaultChunk.section,
+          })),
+        }),
+      });
 
-      if (response.ok && response.body) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+      if (res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('text/event-stream') && res.body) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
 
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            const eventMatch = line.match(/^event:\s*(\w+)/m);
-            const dataMatch = line.match(/^data:\s*(.+)$/m);
-            if (eventMatch && dataMatch) {
-              const eventType = eventMatch[1];
-              try {
-                const payload = JSON.parse(dataMatch[1]);
-                if (eventType === 'token' && payload.text) {
-                  accumulatedText += payload.text;
-                  setInvestigations((prev) =>
-                    prev.map((r) =>
-                      r.id === invId ? { ...r, synthesis: accumulatedText } : r
-                    )
-                  );
-                } else if (eventType === 'retrieval' && payload.includedChunks?.[0]) {
-                  const top = payload.includedChunks[0];
-                  const liveCitation: CitationItem = {
-                    id: `chunk-live-${top.chunkIndex}`,
-                    documentTitle: top.title || matchedPolicy.title,
-                    page: top.page || 1,
-                    chunkId: top.chunkIndex,
-                    section: top.section || matchedPolicy.defaultChunk.section,
-                    rawText: top.content || matchedPolicy.defaultChunk.rawText,
-                    similarityScore: top.rrfScore
-                      ? Math.min(0.99, 0.85 + top.rrfScore * 2)
-                      : 0.965,
-                    tenantId: currentTenant.id,
-                    vectorAlgorithm: 'pgvector HNSW (cosine) + RRF',
-                  };
-                  setPinnedCitation(liveCitation);
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+              if (trimmedLine.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(trimmedLine.slice(6));
+                  if (data.text) {
+                    accumulatedText += data.text;
+                    setInvestigations((prev) =>
+                      prev.map((r) =>
+                        r.id === invId ? { ...r, synthesis: accumulatedText } : r
+                      )
+                    );
+                  }
+                } catch {
+                  // ignore partial json
                 }
-              } catch {
-                // ignore frame parse errors
               }
             }
           }
-        }
-        if (accumulatedText.trim().length > 0) {
-          streamSucceeded = true;
+          if (accumulatedText.trim().length > 0) {
+            streamSucceeded = true;
+          }
+        } else if (contentType.includes('application/json')) {
+          const json = await res.json();
+          if (json.answer) {
+            accumulatedText = json.answer;
+            const chunks = json.answer.split(' ');
+            let current = '';
+            for (let i = 0; i < chunks.length; i++) {
+              await new Promise((r) => setTimeout(r, 20));
+              current += (i === 0 ? '' : ' ') + chunks[i];
+              setInvestigations((prev) =>
+                prev.map((r) => (r.id === invId ? { ...r, synthesis: current } : r))
+              );
+            }
+            if (json.citation) {
+              setPinnedCitation((prev) => ({
+                ...prev,
+                documentTitle: json.citation.title || prev.documentTitle,
+                rawText: json.citation.text || prev.rawText,
+              }));
+            }
+            streamSucceeded = true;
+          }
         }
       }
-    } catch {
-      // Backend offline or unreachable, proceed to high-fidelity client engine
+    } catch (routeErr) {
+      console.warn('Next.js Copilot API route stream failed, checking backend:', routeErr);
     }
 
+    // Step 2: Fallback to NestJS stream endpoint if Next.js route wasn't able to stream
     if (!streamSucceeded) {
-      const chunks = generatedText.split(' ');
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL ||
+          (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
+        const response = await fetch(
+          `${apiUrl}/api/v1/copilot/stream?query=${encodeURIComponent(trimmed)}`,
+          {
+            headers: {
+              Accept: 'text/event-stream',
+              'x-tenant-id': currentTenant.id,
+            },
+          }
+        );
+
+        if (response.ok && response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              const eventMatch = line.match(/^event:\s*(\w+)/m);
+              const dataMatch = line.match(/^data:\s*(.+)$/m);
+              if (eventMatch && dataMatch) {
+                const eventType = eventMatch[1];
+                try {
+                  const payload = JSON.parse(dataMatch[1]);
+                  if (eventType === 'token' && payload.text) {
+                    accumulatedText += payload.text;
+                    setInvestigations((prev) =>
+                      prev.map((r) =>
+                        r.id === invId ? { ...r, synthesis: accumulatedText } : r
+                      )
+                    );
+                  } else if (eventType === 'retrieval' && payload.includedChunks?.[0]) {
+                    const top = payload.includedChunks[0];
+                    const liveCitation: CitationItem = {
+                      id: `chunk-live-${top.chunkIndex}`,
+                      documentTitle: top.title || matchedPolicy.title,
+                      page: top.page || 1,
+                      chunkId: top.chunkIndex,
+                      section: top.section || matchedPolicy.defaultChunk.section,
+                      rawText: top.content || matchedPolicy.defaultChunk.rawText,
+                      similarityScore: top.rrfScore
+                        ? Math.min(0.99, 0.85 + top.rrfScore * 2)
+                        : 0.965,
+                      tenantId: currentTenant.id,
+                      vectorAlgorithm: 'pgvector HNSW (cosine) + RRF',
+                    };
+                    setPinnedCitation(liveCitation);
+                  }
+                } catch {
+                  // ignore frame parse errors
+                }
+              }
+            }
+          }
+          if (accumulatedText.trim().length > 0) {
+            streamSucceeded = true;
+          }
+        }
+      } catch {
+        // Backend offline or unreachable
+      }
+    }
+
+    // Step 3: Grounded fallback directly from the matched document's text
+    if (!streamSucceeded) {
+      const fallbackSnippet = matchedPolicy.rawText || matchedPolicy.defaultChunk.rawText;
+      const citationToken = `[REF-${matchedPolicy.code.split('-')[0]}-01]`;
+      const fallbackText = `Pursuant to ${matchedPolicy.title} (${matchedPolicy.version}) ${citationToken}:\n\n"${fallbackSnippet.slice(0, 360).trim()}..."\n\nAll operational activities, system accesses, and compliance directives under tenant boundary ${currentTenant.id} must adhere strictly to these codified requirements ${citationToken}.`;
+
+      const chunks = fallbackText.split(' ');
       let currentText = '';
       for (let i = 0; i < chunks.length; i++) {
-        await new Promise((r) => setTimeout(r, 35));
+        await new Promise((r) => setTimeout(r, 25));
         currentText += (i === 0 ? '' : ' ') + chunks[i];
         setInvestigations((prev) =>
           prev.map((r) => (r.id === invId ? { ...r, synthesis: currentText } : r))

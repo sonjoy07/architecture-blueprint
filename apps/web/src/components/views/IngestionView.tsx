@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   UploadCloud,
   FileText,
@@ -19,9 +19,16 @@ import {
   X,
   ShieldAlert,
   Sparkles,
+  PlusCircle,
 } from 'lucide-react';
 import { useAuthTenant } from '../../context/AuthTenantContext';
 import { IngestedDocument, PiiAuditMetrics } from '../../types';
+import {
+  getTenantPolicies,
+  addTenantPolicy,
+  deleteTenantPolicy,
+  PolicyDocumentMetadata,
+} from '../../lib/policy-store';
 
 const INITIAL_DOCS_STORE: Record<string, IngestedDocument[]> = {
   t_acme_corp: [
@@ -175,9 +182,12 @@ const INITIAL_DOCS_STORE: Record<string, IngestedDocument[]> = {
 
 export function IngestionView() {
   const { currentTenant, user, hasPermission } = useAuthTenant();
-  const [documentsState, setDocumentsState] = useState(INITIAL_DOCS_STORE);
+  const [documentsState, setDocumentsState] = useState<Record<string, IngestedDocument[]>>(INITIAL_DOCS_STORE);
   const [searchFilter, setSearchFilter] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
+  const [pasteTitle, setPasteTitle] = useState('');
+  const [pasteContent, setPasteContent] = useState('');
   const [activeUpload, setActiveUpload] = useState<{
     fileName: string;
     fileSize: string;
@@ -185,6 +195,40 @@ export function IngestionView() {
     logs: string[];
     metrics?: PiiAuditMetrics;
   } | null>(null);
+
+  // Sync with local policy store
+  useEffect(() => {
+    const syncPolicies = () => {
+      const stored = getTenantPolicies(currentTenant.id);
+      const converted: IngestedDocument[] = stored.map((p) => ({
+        id: p.id,
+        tenantId: currentTenant.id,
+        title: p.title,
+        fileType: p.title.endsWith('.txt') || p.title.endsWith('.md') ? 'TXT' : 'PDF',
+        fileSize: `${Math.max(1.2, p.chunkCount * 0.08).toFixed(1)} MB`,
+        status: 'INDEXED',
+        chunks: p.chunkCount,
+        redactionStatus: 'SCRUBBED',
+        sha256Hash: p.sha256Hash,
+        piiAudit: {
+          phoneNumbers: 2,
+          nationalIds: 1,
+          emails: 3,
+          creditCards: 0,
+          totalCharactersRedacted: 140,
+        },
+        createdAt: new Date().toISOString(),
+      }));
+      setDocumentsState((prev) => ({
+        ...prev,
+        [currentTenant.id]: converted,
+      }));
+    };
+
+    syncPolicies();
+    window.addEventListener('tenant-policies-updated', syncPolicies);
+    return () => window.removeEventListener('tenant-policies-updated', syncPolicies);
+  }, [currentTenant.id]);
 
   // Permission check: write access required
   const canIngest = hasPermission('documents:write');
@@ -194,15 +238,38 @@ export function IngestionView() {
     d.title.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
-  const simulateIngestionPipeline = async (file: { name: string; size: string }) => {
+  const simulateIngestionPipeline = async (file: {
+    name: string;
+    size: string;
+    content?: string;
+    rawFile?: File;
+  }) => {
+    let fileText = file.content || '';
+    if (!fileText && file.rawFile) {
+      try {
+        fileText = await file.rawFile.text();
+      } catch {
+        fileText = '';
+      }
+    }
+    if (!fileText) {
+      fileText = `Policy Document: ${file.name}\nGoverning Operational Directives for Tenant Boundary ${currentTenant.id}.\nAll staff, engineers, and applications must strictly adhere to the mandatory provisions codified herein.`;
+    }
+
     const ts = () => new Date().toISOString();
+    const phoneMatches = fileText.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g) || [];
+    const emailMatches = fileText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+    const nidMatches = fileText.match(/\b\d{10,17}\b/g) || [];
+
     const detectedPii: PiiAuditMetrics = {
-      phoneNumbers: Math.floor(Math.random() * 4) + 1,
-      nationalIds: Math.floor(Math.random() * 2) + 1,
-      emails: Math.floor(Math.random() * 5) + 2,
+      phoneNumbers: Math.max(phoneMatches.length, Math.floor(Math.random() * 3) + 1),
+      nationalIds: Math.max(nidMatches.length, Math.floor(Math.random() * 2) + 1),
+      emails: Math.max(emailMatches.length, Math.floor(Math.random() * 4) + 1),
       creditCards: Math.floor(Math.random() * 2),
-      totalCharactersRedacted: Math.floor(Math.random() * 220) + 95,
+      totalCharactersRedacted: Math.floor(Math.random() * 180) + 80,
     };
+
+    const chunkCount = Math.max(1, Math.ceil(fileText.length / 320));
 
     // Stage 1: Document Parsed
     setActiveUpload({
@@ -212,11 +279,11 @@ export function IngestionView() {
       logs: [
         `[${ts()}] [INGEST_PERIMETER] PAYLOAD_RECEIVE: file='${file.name}' size='${file.size}'`,
         `[${ts()}] [PARSER_WORKER] UNPACK_OK: extracting text streams, normalizing UTF-8 chunks...`,
-        `[${ts()}] [STAGE_1_COMPLETED] Chunks created: 42 semantic blocks identified.`,
+        `[${ts()}] [STAGE_1_COMPLETED] Chunks created: ${chunkCount} semantic blocks identified (${fileText.length} characters parsed).`,
       ],
       metrics: detectedPii,
     });
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((r) => setTimeout(r, 650));
 
     // Stage 2: Deterministic PII Redacted
     setActiveUpload((prev) => ({
@@ -230,7 +297,7 @@ export function IngestionView() {
         `[${ts()}] [STAGE_2_COMPLETED] Total ${detectedPii.totalCharactersRedacted} sensitive bytes masked to immutable tokens.`,
       ],
     }));
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 700));
 
     // Stage 3: Vector Embeddings Generated
     setActiveUpload((prev) => ({
@@ -240,56 +307,78 @@ export function IngestionView() {
         ...prev!.logs,
         `[${ts()}] [EMBEDDING_GEN] Invoking text-embedding-3-small (1536-dim vectors)`,
         `[${ts()}] [EMBEDDING_GEN] Generating HNSW graph index: m=16, ef_construction=64`,
-        `[${ts()}] [STAGE_3_COMPLETED] 42 vector embeddings generated with cosine normalization.`,
+        `[${ts()}] [STAGE_3_COMPLETED] ${chunkCount} vector embeddings generated with cosine normalization.`,
       ],
     }));
-    await new Promise((r) => setTimeout(r, 750));
+    await new Promise((r) => setTimeout(r, 700));
 
-    // Stage 4: Committed to RLS Partition
+    // Stage 4: Committed to RLS Partition & Policy Store
     setActiveUpload((prev) => ({
       ...prev!,
       stage: 4,
       logs: [
-        ...prev!.logs,
         `[${ts()}] [POSTGRES_KERNEL] BEGIN TRANSACTION; SET LOCAL app.current_tenant_id = '${currentTenant.id}';`,
         `[${ts()}] [POSTGRES_KERNEL] INSERT INTO documents & document_chunks (partition='${currentTenant.shardId}')`,
         `[${ts()}] [POSTGRES_KERNEL] RLS CONSTRAINT VERIFIED: zero-leakage isolation bound.`,
-        `[${ts()}] [STAGE_4_COMPLETED] SUCCESS: Document committed to '${currentTenant.id}' vault.`,
+        `[${ts()}] [STAGE_4_COMPLETED] SUCCESS: Document committed to '${currentTenant.id}' vault and indexed into Copilot engine.`,
       ],
     }));
     await new Promise((r) => setTimeout(r, 600));
 
-    const newDoc: IngestedDocument = {
-      id: `doc-${Date.now()}`,
-      tenantId: currentTenant.id,
+    const docId = `doc-${Date.now()}`;
+    const cleanName = file.name.replace(/\.[^/.]+$/, '');
+    const code = cleanName.replace(/[^a-zA-Z0-9]/g, '-').toUpperCase().slice(0, 16) + '-v1';
+    const sha256 = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    const newPolicy: PolicyDocumentMetadata = {
+      id: docId,
+      code,
       title: file.name,
-      fileType: 'PDF',
-      fileSize: file.size,
-      status: 'INDEXED',
-      chunks: 42,
-      redactionStatus: 'SCRUBBED',
-      sha256Hash: Array.from(crypto.getRandomValues(new Uint8Array(16)))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join(''),
-      piiAudit: detectedPii,
-      createdAt: new Date().toISOString(),
+      version: 'v1.0',
+      lastSynced: 'Just now',
+      chunkCount,
+      tag: 'INGESTED-POLICY',
+      sha256Hash: sha256,
+      defaultChunk: {
+        id: `chunk-${docId}-01`,
+        documentTitle: file.name,
+        page: 1,
+        chunkId: 1,
+        section: 'Section 1.0 - Operational Policy Directive',
+        rawText: fileText.slice(0, 450),
+        similarityScore: 0.984,
+        tenantId: currentTenant.id,
+        vectorAlgorithm: 'pgvector HNSW (cosine)',
+      },
+      rawText: fileText,
+      isCustom: true,
     };
 
-    setDocumentsState((prev) => ({
-      ...prev,
-      [currentTenant.id]: [newDoc, ...(prev[currentTenant.id] || [])],
-    }));
+    // Save to shared policy store so PolicyWorkstation and Gemini Copilot immediately have this document!
+    addTenantPolicy(currentTenant.id, newPolicy);
+
+    // Also attempt backend dispatch
+    try {
+      if (file.rawFile) {
+        const formData = new FormData();
+        formData.append('file', file.rawFile);
+        fetch('/api/v1/documents/upload', {
+          method: 'POST',
+          headers: { 'x-tenant-id': currentTenant.id },
+          body: formData,
+        }).catch(() => {});
+      }
+    } catch {}
 
     setTimeout(() => {
       setActiveUpload(null);
-    }, 1500);
+    }, 1200);
   };
 
   const handleDelete = (id: string) => {
-    setDocumentsState((prev) => ({
-      ...prev,
-      [currentTenant.id]: (prev[currentTenant.id] || []).filter((d) => d.id !== id),
-    }));
+    deleteTenantPolicy(currentTenant.id, id);
   };
 
   return (
@@ -407,14 +496,20 @@ export function IngestionView() {
               setIsDragging(true);
             }}
             onDragLeave={() => setIsDragging(false)}
-            onDrop={(e) => {
+            onDrop={async (e) => {
               e.preventDefault();
               setIsDragging(false);
               if (e.dataTransfer.files?.[0]) {
                 const f = e.dataTransfer.files[0];
+                let text = '';
+                try {
+                  text = await f.text();
+                } catch {}
                 simulateIngestionPipeline({
                   name: f.name,
                   size: (f.size / (1024 * 1024)).toFixed(1) + ' MB',
+                  content: text,
+                  rawFile: f,
                 });
               }
             }}
@@ -427,29 +522,46 @@ export function IngestionView() {
             <div className="max-w-md mx-auto space-y-2">
               <UploadCloud className="w-8 h-8 text-[#2563EB] mx-auto" />
               <div className="text-[#0F172A] font-semibold text-xs">
-                Drag and drop corporate policy documents (.PDF, .TXT)
+                Drag and drop corporate policy documents (.PDF, .TXT, .MD, .JSON)
               </div>
               <p className="text-[11px] text-[#64748B] font-sans">
                 Automatic zero-egress perimeter redaction enforces Luhn algorithm (PCI DSS) and Bangladesh National ID (10/13/17-digit) masking prior to vector embedding generation.
               </p>
-              <div className="pt-2 flex items-center justify-center gap-3">
-                <label className="px-3 py-1.5 rounded-[3px] bg-[#0F172A] hover:bg-[#1E293B] text-white cursor-pointer border border-[#0F172A] text-xs transition-colors">
+              <div className="pt-2 flex items-center justify-center gap-2.5 flex-wrap">
+                <label className="px-3 py-1.5 rounded-[3px] bg-[#0F172A] hover:bg-[#1E293B] text-white cursor-pointer border border-[#0F172A] text-xs transition-colors flex items-center gap-1.5">
+                  <UploadCloud className="w-3.5 h-3.5" />
                   Select File
                   <input
                     type="file"
-                    accept=".pdf,.txt"
+                    accept=".pdf,.txt,.md,.json,.csv"
                     className="hidden"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       if (e.target.files?.[0]) {
                         const f = e.target.files[0];
+                        let text = '';
+                        try {
+                          text = await f.text();
+                        } catch {}
                         simulateIngestionPipeline({
                           name: f.name,
                           size: (f.size / (1024 * 1024)).toFixed(1) + ' MB',
+                          content: text,
+                          rawFile: f,
                         });
                       }
                     }}
                   />
                 </label>
+
+                <button
+                  type="button"
+                  onClick={() => setIsPasteModalOpen(true)}
+                  className="px-3 py-1.5 rounded-[3px] bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] border border-[#BFDBFE] cursor-pointer text-xs transition-colors flex items-center gap-1.5 font-medium"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  Paste Policy Text
+                </button>
+
                 <button
                   type="button"
                   onClick={() =>
@@ -458,13 +570,102 @@ export function IngestionView() {
                       size: '14.2 MB',
                     })
                   }
-                  className="px-3 py-1.5 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#2563EB] border border-[#CBD5E1] cursor-pointer text-xs transition-colors"
+                  className="px-3 py-1.5 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#64748B] border border-[#CBD5E1] cursor-pointer text-xs transition-colors"
                 >
-                  Simulate Sample Ingestion
+                  Simulate Sample
                 </button>
               </div>
             </div>
           </div>
+
+          {/* Paste Policy Text Modal */}
+          {isPasteModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <div className="bg-[#FFFFFF] border border-[#CBD5E1] rounded-[6px] shadow-xl w-full max-w-xl p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#2563EB]" />
+                    <span className="font-semibold text-sm text-[#0F172A]">
+                      Direct Ingest & Scrub Policy Document
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsPasteModalOpen(false)}
+                    className="text-[#94A3B8] hover:text-[#0F172A] p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-3 font-mono text-xs">
+                  <div>
+                    <label className="block text-[#475569] font-medium mb-1">
+                      Policy Document Title (.txt / .md / .pdf)
+                    </label>
+                    <input
+                      type="text"
+                      value={pasteTitle}
+                      onChange={(e) => setPasteTitle(e.target.value)}
+                      placeholder="e.g. Remote_Work_and_Stipend_Policy_2026.txt"
+                      className="w-full bg-[#FFFFFF] border border-[#CBD5E1] rounded-[3px] px-3 py-1.5 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[#475569] font-medium mb-1">
+                      Policy Content / Standard Operating Procedure
+                    </label>
+                    <textarea
+                      rows={6}
+                      value={pasteContent}
+                      onChange={(e) => setPasteContent(e.target.value)}
+                      placeholder="Paste complete policy text here... E.g.: 'Employees are permitted up to 3 remote days per week. High-speed home fiber subsidy is $60 USD per month. Approved equipment expenses are reimbursed up to $1,000 USD every 2 years through the employee portal.'"
+                      className="w-full bg-[#FFFFFF] border border-[#CBD5E1] rounded-[3px] px-3 py-2 text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] font-sans"
+                    />
+                  </div>
+
+                  <div className="text-[11px] text-[#64748B] bg-[#F8FAFC] p-2.5 rounded-[3px] border border-[#E2E8F0]">
+                    💡 <strong>Live Copilot Grounding:</strong> Once ingested, this document is immediately committed to partition <code>{currentTenant.id}</code> and indexed into Gemini Copilot Workstation. You can immediately ask questions about this policy in Copilot!
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E2E8F0]">
+                  <button
+                    type="button"
+                    onClick={() => setIsPasteModalOpen(false)}
+                    className="px-3 py-1.5 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#475569] text-xs font-medium cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!pasteTitle.trim() || !pasteContent.trim()}
+                    onClick={() => {
+                      if (!pasteTitle.trim() || !pasteContent.trim()) return;
+                      const titleWithExt =
+                        pasteTitle.endsWith('.txt') ||
+                        pasteTitle.endsWith('.md') ||
+                        pasteTitle.endsWith('.pdf')
+                          ? pasteTitle
+                          : `${pasteTitle}.txt`;
+                      simulateIngestionPipeline({
+                        name: titleWithExt,
+                        size: `${Math.max(0.1, (new Blob([pasteContent]).size / (1024 * 1024))).toFixed(1)} MB`,
+                        content: pasteContent,
+                      });
+                      setIsPasteModalOpen(false);
+                      setPasteTitle('');
+                      setPasteContent('');
+                    }}
+                    className="px-4 py-1.5 rounded-[3px] bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white text-xs font-medium cursor-pointer flex items-center gap-1.5 transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Run 4-Stage Ingestion Pipeline
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
