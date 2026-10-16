@@ -25,10 +25,10 @@ export function Navbar() {
           </div>
           <div>
             <span className="font-bold text-slate-900 dark:text-slate-100 text-sm tracking-tight block">
-              Enterprise Copilot
+              LexiGuard Copilot
             </span>
-            <span className="text-[10px] text-slate-400 font-mono block -mt-0.5">
-              Multi-Tenant RAG v2.4
+            <span className="text-[10px] text-slate-400 font-medium block -mt-0.5">
+              Enterprise Compliance Vault
             </span>
           </div>
         </Link>

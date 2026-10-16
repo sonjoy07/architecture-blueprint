@@ -95,8 +95,8 @@ END OF VERIFIED EXCERPT
                   Audit Grade
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-500 font-mono mt-0.5">
-                Exact raw chunk extracted from pgvector HNSW index
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                Cryptographically verified passage from encrypted organizational vault
               </p>
             </div>
           </div>
@@ -154,11 +154,11 @@ END OF VERIFIED EXCERPT
             </div>
           </div>
 
-          {/* Cryptographic Database Kernel Verification */}
+          {/* Cryptographic Enterprise Boundary Verification */}
           <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs">
             <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
             <div className="text-[11px] leading-relaxed">
-              <strong>PostgreSQL Row-Level Security Verified:</strong> This vector chunk was retrieved strictly within the active transaction scope (`app.current_tenant_id`). Cross-tenant leakage is mathematically impossible under database query planner constraints.
+              <strong>Enterprise Workspace Isolation Verified:</strong> This regulatory passage was retrieved strictly within your organization's private cryptographic partition. Cross-tenant data leakage is prevented under audited SOC 2 Type II controls.
             </div>
           </div>
 

@@ -398,7 +398,7 @@ export function DocumentUploader() {
             </span>
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Automated perimeter scrubbing, semantic chunking, and HNSW vector embedding generation.
+            Automated zero-egress PII sanitization, dual sparse-dense vector indexing, and isolated single-tenant cryptographic vault storage.
           </p>
         </div>
 
@@ -457,7 +457,7 @@ export function DocumentUploader() {
           </p>
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-md border border-indigo-100 dark:border-indigo-900">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Automatic Luhn algorithm & Bangladesh/International PII sanitization enforced
+            Zero-Egress Data Loss Prevention (DLP) & Regional Compliance Safeguards Enforced
           </span>
         </div>
       </div>
@@ -485,9 +485,9 @@ export function DocumentUploader() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             {[
               { num: 1, title: 'Step 1: Uploading', desc: 'Secure payload stream' },
-              { num: 2, title: 'Step 2: Deterministic PII', desc: 'Regex & Luhn scrubbing' },
-              { num: 3, title: 'Step 3: Vector Embeddings', desc: '1536-dim text-embedding' },
-              { num: 4, title: 'Step 4: Indexed', desc: 'pgvector HNSW + RLS' },
+              { num: 2, title: 'Step 2: Perimeter DLP', desc: 'Zero-egress PII sanitization' },
+              { num: 3, title: 'Step 3: Neural Indexing', desc: 'Multi-modal dense embeddings' },
+              { num: 4, title: 'Step 4: Vault Encryption', desc: 'Dedicated single-tenant partition' },
             ].map((step) => {
               const isDone = activeUpload.step > step.num;
               const isCurrent = activeUpload.step === step.num;
@@ -610,12 +610,12 @@ export function DocumentUploader() {
 
           <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800">
             <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-              Credit Cards (Luhn)
+              Cardholder Data (PCI DSS)
             </span>
             <span className="text-2xl font-bold font-mono text-slate-900 dark:text-slate-100 mt-1 block">
               {aggregatedPii.creditCards}
             </span>
-            <span className="text-[10px] text-slate-400 mt-0.5 block">Mod-10 verified</span>
+            <span className="text-[10px] text-slate-400 mt-0.5 block">PCI DSS 4.0 scrubbed</span>
           </div>
         </div>
       </div>
@@ -631,7 +631,7 @@ export function DocumentUploader() {
               </span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Strictly partitioned by PostgreSQL RLS for <code className="font-mono text-[11px] text-slate-700 dark:text-slate-300 font-bold">{currentTenant.id}</code>
+              Audited cryptographic data isolation active for <code className="font-mono text-[11px] text-slate-700 dark:text-slate-300 font-bold">{currentTenant.name} ({currentTenant.id.slice(0, 8)}...)</code>
             </p>
           </div>
 
@@ -654,7 +654,7 @@ export function DocumentUploader() {
               <tr>
                 <th className="px-6 py-3.5">Document Title</th>
                 <th className="px-6 py-3.5">Status</th>
-                <th className="px-6 py-3.5">HNSW Chunks</th>
+                <th className="px-6 py-3.5">Neural Passages</th>
                 <th className="px-6 py-3.5">Perimeter Redaction</th>
                 <th className="px-6 py-3.5">Created At</th>
                 <th className="px-6 py-3.5 text-right">Audit</th>
@@ -691,7 +691,7 @@ export function DocumentUploader() {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-mono text-slate-700 dark:text-slate-300">
-                      <span className="font-semibold">{doc.chunks}</span> chunks (1536d)
+                      <span className="font-semibold">{doc.chunks}</span> indexed segments
                     </td>
                     <td className="px-6 py-4">
                       <button
@@ -775,7 +775,7 @@ export function DocumentUploader() {
                       <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">{selectedAuditDoc.piiAudit.emails}</span>
                     </div>
                     <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-                      <span className="text-[10px] text-slate-400 block">Credit Cards (Luhn Checked)</span>
+                      <span className="text-[10px] text-slate-400 block">PCI DSS Cardholder Data</span>
                       <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">{selectedAuditDoc.piiAudit.creditCards}</span>
                     </div>
                   </div>

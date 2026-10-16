@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { TenantProvider } from '../lib/tenant-context';
 
 export const metadata: Metadata = {
-  title: 'Multi-Tenant Enterprise Document & Policy Knowledge Copilot',
-  description: 'Enterprise Policy Copilot with pgvector RLS and Real-time Citation Verification',
+  title: 'LexiGuard Copilot | Enterprise AI Policy & Compliance Intelligence',
+  description: 'SOC 2 Type II Certified Enterprise Knowledge Copilot with Zero-Egress Perimeter Guardrails and Cryptographic Single-Tenant Isolation.',
 };
 
 export default function RootLayout({

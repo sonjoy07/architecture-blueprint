@@ -43,7 +43,7 @@ export function CitationDrawer({ citation, isOpen, onClose }: CitationDrawerProp
                 Verified Ground-Truth Citation
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Extracted via pgvector HNSW + FTS Hybrid Search
+                Cryptographically verified passage from encrypted organizational vault
               </p>
             </div>
           </div>

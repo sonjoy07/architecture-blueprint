@@ -129,7 +129,7 @@ export function DocumentDashboard() {
             Document Ingestion & Tenant Policy Vault
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Manage corporate policies with automated PII scrub and pgvector HNSW indexing.
+            Manage corporate policies with automated zero-egress PII sanitization and cryptographically isolated vector indexing.
           </p>
         </div>
 

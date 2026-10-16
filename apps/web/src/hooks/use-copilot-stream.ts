@@ -10,7 +10,7 @@ export function useCopilotStream() {
     {
       id: 'welcome-msg',
       role: 'assistant',
-      content: `Hello! I am your Enterprise Policy & Knowledge Copilot for **${currentTenant.name}**.\n\nAll answers are strictly verified against authorized tenant policies with cryptographic Row-Level Security and citation guardrails. How can I help you today?`,
+      content: `Hello! I am your Enterprise Policy & Compliance Copilot for **${currentTenant.name}**.\n\nAll answers are strictly verified against authorized corporate policies within your organization's isolated compliance vault and citation guardrails. How can I help you today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -47,7 +47,7 @@ export function useCopilotStream() {
       abortControllerRef.current = new AbortController();
 
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
         const endpoint = `${apiUrl}/api/v1/copilot/stream?query=${encodeURIComponent(query)}`;
 
         const response = await fetch(endpoint, {

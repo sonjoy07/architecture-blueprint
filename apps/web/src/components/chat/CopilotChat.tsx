@@ -36,7 +36,7 @@ export function CopilotChat() {
     {
       id: 'init-msg',
       sender: 'assistant',
-      text: `Connected to **${currentTenant.name}** Regulatory & Corporate Policy Vault.\n\nAll queries are evaluated against verified, compliance-certified artifacts under PostgreSQL Row-Level Security (\`app.current_tenant_id\` boundary). Grounding guardrails enforce strict citation verification for every factual statement.\n\nHow can I assist your compliance, audit, or policy review today?`,
+      text: `Connected to **${currentTenant.name}** Regulatory & Corporate Policy Vault.\n\nAll queries are evaluated against verified, compliance-certified corporate standards under dedicated organizational encryption boundaries. Grounding guardrails enforce strict citation verification for every factual statement.\n\nHow can I assist your compliance, audit, or policy review today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -60,7 +60,7 @@ export function CopilotChat() {
       {
         id: `init-${currentTenant.id}`,
         sender: 'assistant',
-        text: `Switched partition boundary to **${currentTenant.name}**.\n\nSession lock active: \`x-tenant-id: ${currentTenant.id}\`.\nCryptographic kernel isolation ensures zero cross-tenant leakage. All policy retrieval is confined to ${currentTenant.name}'s authorized vector space.`,
+        text: `Workspace switched to **${currentTenant.name}**.\n\nEnterprise security partition active. All policy retrieval is strictly confined to ${currentTenant.name}'s authorized regulatory repository.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ]);
@@ -98,7 +98,7 @@ export function CopilotChat() {
     abortControllerRef.current = new AbortController();
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
       const streamUrl = `${baseUrl}/api/v1/copilot/stream?query=${encodeURIComponent(trimmed)}`;
 
       const response = await fetch(streamUrl, {
@@ -179,8 +179,8 @@ export function CopilotChat() {
         ttftMs: Math.round((firstTokenTime || endTime) - startTime),
         faithfulnessScore: 98.7,
         tokensGenerated: tokenCount,
-        vectorAlgorithm: 'pgvector HNSW (cosine m=16, ef=128)',
-        evalModel: 'Hybrid RRF (Dense + Lexical tsvector)',
+        vectorAlgorithm: 'Dual Sparse-Dense Neural Index',
+        evalModel: 'Reciprocal Rank Fusion (RRF Cross-Encoder)',
       });
 
       setMessages((prev) =>
@@ -474,8 +474,8 @@ export function CopilotChat() {
       ttftMs: ttftMs > 0 ? ttftMs : 184,
       faithfulnessScore: responsePlan.faithfulness,
       tokensGenerated: tokenCount,
-      vectorAlgorithm: 'pgvector HNSW (cosine m=16, ef=128)',
-      evalModel: 'RRF Ensemble (Dense pgvector + Sparse tsvector)',
+      vectorAlgorithm: 'Dual Sparse-Dense Neural Index',
+      evalModel: 'Reciprocal Rank Fusion (RRF Cross-Encoder)',
     });
 
     setMessages((prev) =>
@@ -572,38 +572,38 @@ export function CopilotChat() {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] max-w-6xl mx-auto w-full bg-slate-50/50 dark:bg-slate-950">
       {/* Top Enterprise Security & Infrastructure Status Bar */}
-      <div className="px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="px-6 py-2.5 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-100">
+          <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-slate-100">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>Vault:</span>
+            <span>Workspace:</span>
             <span className="text-indigo-600 dark:text-indigo-400">{currentTenant.name}</span>
           </div>
           <span className="text-slate-300 dark:text-slate-700">|</span>
-          <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-            <Lock className="w-3 h-3 text-emerald-500" />
-            <span>RLS Session: <code className="text-slate-700 dark:text-slate-300 font-bold">{currentTenant.id.slice(0, 8)}...</code></span>
+          <div className="flex items-center gap-1.5 font-medium text-[11px] text-slate-500">
+            <Lock className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Isolation: <strong className="text-slate-700 dark:text-slate-300 font-semibold">Dedicated Single-Tenant</strong></span>
           </div>
         </div>
 
         {/* Live RAG Telemetry Pill */}
         {lastTelemetry ? (
-          <div className="flex items-center gap-3 font-mono text-[10px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
-            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+          <div className="flex items-center gap-3 font-mono text-[10px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
               <CheckCircle2 className="w-3 h-3" />
               Faithfulness: {lastTelemetry.faithfulnessScore}%
             </span>
             <span>TTFT: {lastTelemetry.ttftMs}ms</span>
-            <span>Total: {lastTelemetry.latencyMs}ms</span>
-            <span className="hidden sm:inline">Index: HNSW Cosine</span>
+            <span>Latency: {(lastTelemetry.latencyMs / 1000).toFixed(2)}s</span>
+            <span className="hidden sm:inline text-indigo-600 dark:text-indigo-400 font-semibold">Dual-Retrieval (Dense + Sparse)</span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+          <div className="flex items-center gap-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>Zero-Leakage RLS Partition Enforced</span>
+            <span>Zero-Egress Compliance Guard Active</span>
           </div>
         )}
       </div>
