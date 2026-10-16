@@ -122,18 +122,26 @@ export class CopilotService {
     context: PackedContext,
     userQuery: string,
   ): AsyncGenerator<string, void, unknown> {
-    const apiKey = process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
+    const apiKey = openaiKey || geminiKey;
 
-    if (apiKey && process.env.NODE_ENV === 'production') {
+    if (apiKey) {
       try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const isGemini = Boolean(geminiKey && !openaiKey);
+        const endpoint = isGemini
+          ? 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
+          : 'https://api.openai.com/v1/chat/completions';
+        const model = isGemini ? 'gemini-1.5-flash' : 'gpt-4o-mini';
+
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model,
             stream: true,
             temperature: 0.1, // Near-zero temperature for compliance fidelity
             messages: [
@@ -173,6 +181,8 @@ export class CopilotService {
             }
           }
           return;
+        } else {
+          this.logger.warn(`External LLM API returned non-OK status: ${response.status} ${response.statusText}`);
         }
       } catch (err) {
         this.logger.warn(`External LLM stream failed: ${(err as Error).message}. Using internal engine.`);

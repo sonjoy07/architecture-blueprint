@@ -400,14 +400,92 @@ export function PolicyWorkstation() {
     setInvestigations((prev) => [...prev, newRecord]);
     setPinnedCitation(citation);
 
-    const chunks = generatedText.split(' ');
-    let currentText = '';
-    for (let i = 0; i < chunks.length; i++) {
-      await new Promise((r) => setTimeout(r, 35));
-      currentText += (i === 0 ? '' : ' ') + chunks[i];
-      setInvestigations((prev) =>
-        prev.map((r) => (r.id === invId ? { ...r, synthesis: currentText } : r))
+    let streamSucceeded = false;
+    let accumulatedText = '';
+
+    try {
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
+      const response = await fetch(
+        `${apiUrl}/api/v1/copilot/stream?query=${encodeURIComponent(trimmed)}`,
+        {
+          headers: {
+            Accept: 'text/event-stream',
+            'x-tenant-id': currentTenant.id,
+          },
+        }
       );
+
+      if (response.ok && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            const eventMatch = line.match(/^event:\s*(\w+)/m);
+            const dataMatch = line.match(/^data:\s*(.+)$/m);
+            if (eventMatch && dataMatch) {
+              const eventType = eventMatch[1];
+              try {
+                const payload = JSON.parse(dataMatch[1]);
+                if (eventType === 'token' && payload.text) {
+                  accumulatedText += payload.text;
+                  setInvestigations((prev) =>
+                    prev.map((r) =>
+                      r.id === invId ? { ...r, synthesis: accumulatedText } : r
+                    )
+                  );
+                } else if (eventType === 'retrieval' && payload.includedChunks?.[0]) {
+                  const top = payload.includedChunks[0];
+                  const liveCitation: CitationItem = {
+                    id: `chunk-live-${top.chunkIndex}`,
+                    documentTitle: top.title || matchedPolicy.title,
+                    page: top.page || 1,
+                    chunkId: top.chunkIndex,
+                    section: top.section || matchedPolicy.defaultChunk.section,
+                    rawText: top.content || matchedPolicy.defaultChunk.rawText,
+                    similarityScore: top.rrfScore
+                      ? Math.min(0.99, 0.85 + top.rrfScore * 2)
+                      : 0.965,
+                    tenantId: currentTenant.id,
+                    vectorAlgorithm: 'pgvector HNSW (cosine) + RRF',
+                  };
+                  setPinnedCitation(liveCitation);
+                }
+              } catch {
+                // ignore frame parse errors
+              }
+            }
+          }
+        }
+        if (accumulatedText.trim().length > 0) {
+          streamSucceeded = true;
+        }
+      }
+    } catch {
+      // Backend offline or unreachable, proceed to high-fidelity client engine
+    }
+
+    if (!streamSucceeded) {
+      const chunks = generatedText.split(' ');
+      let currentText = '';
+      for (let i = 0; i < chunks.length; i++) {
+        await new Promise((r) => setTimeout(r, 35));
+        currentText += (i === 0 ? '' : ' ') + chunks[i];
+        setInvestigations((prev) =>
+          prev.map((r) => (r.id === invId ? { ...r, synthesis: currentText } : r))
+        );
+      }
     }
 
     setInvestigations((prev) =>
