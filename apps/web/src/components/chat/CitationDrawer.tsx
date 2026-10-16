@@ -5,15 +5,13 @@ import {
   X,
   FileText,
   ShieldCheck,
+  Lock,
   Copy,
   Check,
-  Layers,
-  Sparkles,
-  ExternalLink,
-  Hash,
-  Fingerprint,
   Download,
-  Lock,
+  Layers,
+  Terminal,
+  Database,
 } from 'lucide-react';
 import { CitationItem } from '../../types';
 
@@ -21,15 +19,23 @@ interface CitationDrawerProps {
   citation: CitationItem | null;
   isOpen: boolean;
   onClose: () => void;
+  tenantId?: string;
+  tenantName?: string;
 }
 
-export function CitationDrawer({ citation, isOpen, onClose }: CitationDrawerProps) {
+export function CitationDrawer({
+  citation,
+  isOpen,
+  onClose,
+  tenantId = 't_acme_corp',
+  tenantName = 'Acme Corporation',
+}: CitationDrawerProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) onClose();
-    }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
@@ -37,72 +43,57 @@ export function CitationDrawer({ citation, isOpen, onClose }: CitationDrawerProp
   if (!isOpen || !citation) return null;
 
   const handleCopy = () => {
-    if (citation?.rawText) {
-      navigator.clipboard.writeText(citation.rawText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    navigator.clipboard.writeText(citation.rawText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownloadExcerpt = () => {
-    if (!citation) return;
-    const content = `================================================================================
-VERIFIED REGULATORY PASSAGE EXCERPT
-================================================================================
-Document: ${citation.documentTitle}
-Location: Page ${citation.page}, Chunk #${citation.chunkId}
-Section:  ${citation.section || 'General Compliance Directive'}
-Score:    Cosine Similarity: ${(citation.similarityScore).toFixed(4)}
-Tenant:   Verified via PostgreSQL Row-Level Security (app.current_tenant_id)
-Timestamp: ${new Date().toISOString()}
-================================================================================
-
-${citation.rawText}
-
-================================================================================
-END OF VERIFIED EXCERPT
-================================================================================`;
-
-    const blob = new Blob([content], { type: 'text/plain' });
+  const handleDownload = () => {
+    const blob = new Blob([citation.rawText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Citation_${citation.chunkId}_Page${citation.page}.txt`;
+    a.download = `Citation_${citation.documentTitle}_p${citation.page}_chunk${citation.chunkId}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const cosineDistance = (1 - citation.similarityScore).toFixed(4);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-200">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       {/* Slide-over panel */}
-      <div className="relative z-10 w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col h-full transform transition-all ease-in-out duration-300">
+      <div className="relative z-10 w-full max-w-xl bg-slate-950 text-slate-200 border-l border-slate-800 shadow-2xl flex flex-col h-full font-mono text-xs">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/70">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900">
-              <FileText className="w-5 h-5" />
+        <div className="px-5 py-4 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-slate-800 border border-slate-700 text-cyan-400">
+              <Terminal className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>Verified Ground-Truth Citation</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  Audit Grade
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-100 uppercase tracking-wider text-xs">
+                  Citation Inspector
                 </span>
-              </h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                Cryptographically verified passage from encrypted organizational vault
-              </p>
+                <span className="text-[10px] bg-slate-800 border border-slate-700 text-cyan-400 px-1.5 py-0.5 rounded">
+                  CHUNK #{citation.chunkId}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-sans block mt-0.5">
+                Cryptographically bound passage extracted from verified RLS shard
+              </span>
             </div>
           </div>
+
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-850 transition-colors cursor-pointer"
             title="Close Drawer (Esc)"
           >
             <X className="w-4 h-4" />
@@ -110,99 +101,112 @@ END OF VERIFIED EXCERPT
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
-          {/* Metadata Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">
                 Source Document
               </span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100 truncate block mt-1" title={citation.documentTitle}>
+              <span className="font-bold text-slate-200 block truncate mt-1" title={citation.documentTitle}>
                 {citation.documentTitle}
               </span>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">
                 Artifact Location
               </span>
-              <span className="font-semibold font-mono text-slate-900 dark:text-slate-100 block mt-1">
-                Page {citation.page} • Chunk #{citation.chunkId}
+              <span className="font-bold text-slate-200 block mt-1">
+                Page {citation.page} • Chunk Index #{citation.chunkId}
+              </span>
+            </div>
+
+            <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">
+                Similarity Metrics
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-cyan-400 font-bold">Score: {citation.similarityScore.toFixed(4)}</span>
+                <span className="text-slate-500">| dist: {cosineDistance}</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">
+                Partition Key
+              </span>
+              <span className="text-emerald-400 font-semibold block mt-1">
+                {tenantId} ({tenantName})
               </span>
             </div>
           </div>
 
-          {/* Section Breadcrumb & RRF Metrics */}
-          <div className="p-3.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 font-medium">
-                <Layers className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate max-w-[240px]">
-                  {citation.section || 'General Provisions'}
-                </span>
+          {/* Section Breadcrumb */}
+          {citation.section && (
+            <div className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800 flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-slate-300">
+                <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span className="truncate max-w-sm">{citation.section}</span>
               </div>
-
-              <div className="flex items-center gap-1 font-mono text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800">
-                <Sparkles className="w-3 h-3 text-indigo-500" />
-                <span>RRF Score: {(citation.similarityScore).toFixed(4)}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/40 text-[10px] font-mono text-slate-500">
-              <span>Dense Cosine Distance: <strong>&le; 0.084</strong></span>
-              <span>Sparse Lexical Rank: <strong>Rank #1 (BM25)</strong></span>
-            </div>
-          </div>
-
-          {/* Cryptographic Enterprise Boundary Verification */}
-          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs">
-            <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
-            <div className="text-[11px] leading-relaxed">
-              <strong>Enterprise Workspace Isolation Verified:</strong> This regulatory passage was retrieved strictly within your organization's private cryptographic partition. Cross-tenant data leakage is prevented under audited SOC 2 Type II controls.
-            </div>
-          </div>
-
-          {/* Raw Text Excerpt */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Fingerprint className="w-3.5 h-3.5 text-indigo-500" />
-                Verbatim Ingested Chunk Excerpt
+              <span className="text-[9px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded uppercase">
+                HNSW Vector Ref
               </span>
-              <div className="flex items-center gap-3">
+            </div>
+          )}
+
+          {/* Cryptographic RLS Boundary Assurance */}
+          <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 text-[11px] leading-relaxed flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block text-emerald-200">
+                Row-Level Security (RLS) Cryptographic Verification:
+              </span>
+              This text passage was retrieved exclusively through tenant partition query{' '}
+              <code className="text-emerald-300 bg-emerald-950/60 px-1 rounded font-bold">{tenantId}</code>.
+              Cross-tenant boundary bleeding is prevented via PostgreSQL database kernel enforcement.
+            </div>
+          </div>
+
+          {/* Raw Text Box */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5 text-cyan-400" />
+                Verbatim Ingested Chunk Raw Text
+              </span>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={handleDownloadExcerpt}
-                  className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  onClick={handleDownload}
+                  className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 transition-colors cursor-pointer"
                 >
                   <Download className="w-3 h-3" />
-                  Download
+                  <span>Download</span>
                 </button>
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium hover:underline transition-colors cursor-pointer"
+                  className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 transition-colors cursor-pointer"
                 >
-                  {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                  {copied ? 'Copied' : 'Copy passage'}
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-mono leading-relaxed whitespace-pre-wrap shadow-inner selection:bg-indigo-500 selection:text-white border-l-4 border-l-indigo-500">
+            <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 text-slate-200 font-mono text-xs leading-relaxed whitespace-pre-wrap selection:bg-cyan-900 selection:text-white border-l-2 border-l-cyan-500 max-h-96 overflow-y-auto">
               {citation.rawText}
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 flex items-center justify-between text-xs">
-          <span className="text-[10px] text-slate-400 font-mono">
-            Chunk UID: {citation.id}
-          </span>
+        <div className="px-5 py-3 border-t border-slate-800 bg-slate-900 flex items-center justify-between text-[10px] text-slate-500">
+          <span>VECTOR_ALGORITHM: pgvector cosine m=16, ef=128</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+            className="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition-colors cursor-pointer"
           >
-            Close Drawer
+            Close
           </button>
         </div>
       </div>

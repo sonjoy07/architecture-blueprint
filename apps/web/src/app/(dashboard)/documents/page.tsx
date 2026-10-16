@@ -1,5 +1,5 @@
-import { DocumentUploader } from '../../../components/ingestion/DocumentUploader';
+import { IngestionView } from '../../../components/views/IngestionView';
 
 export default function DocumentsPage() {
-  return <DocumentUploader />;
+  return <IngestionView />;
 }
