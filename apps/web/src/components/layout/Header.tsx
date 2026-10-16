@@ -15,13 +15,17 @@ import {
   Layers,
   Info,
   Plus,
+  LogOut,
+  UserCheck,
 } from 'lucide-react';
 import { useTenant } from '../../lib/tenant-context';
+import { useAuth } from '../../lib/auth-context';
 import { CreateWorkspaceModal } from './CreateWorkspaceModal';
 
 export function Header() {
   const pathname = usePathname();
   const { currentTenant, setTenant, availableTenants } = useTenant();
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -126,97 +130,144 @@ export function Header() {
           )}
         </div>
 
-        {/* Right: Enterprise Organization Switcher */}
+        {/* Right: Enterprise Organization & Authenticated User Controls */}
         <div className="flex items-center gap-3">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-xs transition-all cursor-pointer"
-              aria-label="Switch Enterprise Workspace"
-            >
+          {/* Workspace Pill: Locked for standard users, or Switcher for Auditors */}
+          {user && !user.canSwitchTenant ? (
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 shadow-2xs">
               <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
                 <Building2 className="w-3.5 h-3.5" />
               </div>
               <div className="text-left flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[140px] sm:max-w-[180px]">
+                <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[130px] sm:max-w-[170px]">
                   {currentTenant.name}
                 </span>
-                <span className="text-[10px] text-slate-500 font-medium">
-                  {isTenantAcme ? 'Global Enterprise Tier' : 'Healthcare Security Tier'}
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                  <Lock className="w-2.5 h-2.5" />
+                  <span>Isolated Organization</span>
                 </span>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-1">
-                <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Enterprise Workspaces
+            </div>
+          ) : (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                aria-label="Switch Enterprise Workspace"
+              >
+                <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                  <Building2 className="w-3.5 h-3.5" />
+                </div>
+                <div className="text-left flex flex-col">
+                  <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[130px] sm:max-w-[160px]">
+                    {currentTenant.name}
                   </span>
-                  <span className="text-[11px] text-slate-600 dark:text-slate-400 block mt-0.5">
-                    Select isolated organizational compliance partition
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
+                    Auditor Review Switcher
                   </span>
                 </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+              </button>
 
-                <div className="py-1">
-                  {availableTenants.map((tenant) => {
-                    const isSelected = tenant.id === currentTenant.id;
-                    return (
-                      <button
-                        key={tenant.id}
-                        onClick={() => {
-                          setTenant(tenant);
-                          setDropdownOpen(false);
-                        }}
-                        className={`w-full px-4 py-2.5 text-left flex items-start justify-between gap-3 text-xs transition-colors cursor-pointer ${
-                          isSelected
-                            ? 'bg-indigo-50/80 dark:bg-indigo-950/50 text-indigo-950 dark:text-indigo-200'
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-bold text-slate-900 dark:text-slate-100">
-                            {tenant.name}
-                          </span>
-                          <span className="text-[10px] text-slate-500 mt-0.5">
-                            Compliance: {tenant.plan.replace('_', ' ')}
-                          </span>
-                          <div className="flex items-center gap-1.5 mt-1.5">
-                            {tenant.complianceTags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                              >
-                                {tag}
-                              </span>
-                            ))}
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Enterprise Workspaces
+                    </span>
+                    <span className="text-[11px] text-slate-600 dark:text-slate-400 block mt-0.5">
+                      Select isolated organizational compliance partition
+                    </span>
+                  </div>
+
+                  <div className="py-1">
+                    {availableTenants.map((tenant) => {
+                      const isSelected = tenant.id === currentTenant.id;
+                      return (
+                        <button
+                          key={tenant.id}
+                          onClick={() => {
+                            setTenant(tenant);
+                            setDropdownOpen(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left flex items-start justify-between gap-3 text-xs transition-colors cursor-pointer ${
+                            isSelected
+                              ? 'bg-indigo-50/80 dark:bg-indigo-950/50 text-indigo-950 dark:text-indigo-200'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-900 dark:text-slate-100">
+                              {tenant.name}
+                            </span>
+                            <span className="text-[10px] text-slate-500 mt-0.5">
+                              Compliance: {tenant.plan.replace('_', ' ')}
+                            </span>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                              {tenant.complianceTags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        {isSelected && (
-                          <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-1" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                          {isSelected && (
+                            <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-1" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                {/* Provision New Workspace Action */}
-                <div className="p-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
-                  <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      setIsCreateModalOpen(true);
-                    }}
-                    className="w-full py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer border border-indigo-200/80 dark:border-indigo-800/80 shadow-2xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Provision New Workspace</span>
-                  </button>
+                  {/* Provision New Workspace Action */}
+                  <div className="p-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        setIsCreateModalOpen(true);
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer border border-indigo-200/80 dark:border-indigo-800/80 shadow-2xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Provision New Workspace</span>
+                    </button>
+                  </div>
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Authenticated User Pill & Sign Out */}
+          {user && (
+            <div className="flex items-center gap-2 pl-3 border-l border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-indigo-600 flex items-center justify-center text-xs font-bold shadow-xs border border-slate-700"
+                  title={`${user.name} (${user.email})`}
+                >
+                  {user.avatarText}
+                </div>
+                <div className="hidden xl:flex flex-col text-left">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                    {user.name}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">
+                    {user.role.replace('_', ' ')}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                  title="Sign Out (Lock Session)"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

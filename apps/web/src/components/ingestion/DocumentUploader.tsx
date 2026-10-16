@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTenant } from '../../lib/tenant-context';
+import { useAuth } from '../../lib/auth-context';
 import { IngestedDocument, PiiAuditMetrics, ProcessingStep } from '../../types';
 
 const INITIAL_DOCUMENTS: IngestedDocument[] = [
@@ -229,6 +230,7 @@ const INITIAL_DOCUMENTS: IngestedDocument[] = [
 
 export function DocumentUploader() {
   const { currentTenant, getApiHeaders } = useTenant();
+  const { user } = useAuth();
   const [documents, setDocuments] = useState<IngestedDocument[]>(() => {
     try {
       const stored = localStorage.getItem('app.custom_documents');
@@ -448,9 +450,15 @@ export function DocumentUploader() {
               {currentTenant.name}
             </span>
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Automated zero-egress PII sanitization, dual sparse-dense vector indexing, and isolated cryptographic workspace vault storage.
-          </p>
+          <div className="text-sm text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+            <span>Automated zero-egress PII sanitization and isolated cryptographic workspace vault storage.</span>
+            {user && (
+              <span className="inline-flex items-center gap-1 font-mono text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                <Lock className="w-2.5 h-2.5 text-emerald-500" />
+                Authorized Session: <strong>{user.name}</strong> ({user.role.replace('_', ' ')})
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

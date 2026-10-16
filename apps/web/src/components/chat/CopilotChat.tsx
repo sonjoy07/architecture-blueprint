@@ -18,6 +18,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useTenant } from '../../lib/tenant-context';
+import { useAuth } from '../../lib/auth-context';
 import { Message, CitationItem } from '../../types';
 import { CitationDrawer } from './CitationDrawer';
 
@@ -32,6 +33,7 @@ interface TelemetryMeta {
 
 export function CopilotChat() {
   const { currentTenant, getApiHeaders } = useTenant();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'init-msg',
@@ -584,6 +586,14 @@ export function CopilotChat() {
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
             <span>Isolation: <strong className="text-slate-700 dark:text-slate-300 font-semibold">Cryptographic Organization Boundary</strong></span>
           </div>
+          {user && (
+            <>
+              <span className="text-slate-300 dark:text-slate-700">|</span>
+              <div className="flex items-center gap-1.5 font-medium text-[11px] text-slate-500 font-mono">
+                <span>Identity: <strong className="text-slate-700 dark:text-slate-300 font-semibold">{user.name}</strong></span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Live RAG Telemetry Pill */}

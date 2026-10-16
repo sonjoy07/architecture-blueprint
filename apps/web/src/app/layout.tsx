@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { TenantProvider } from '../lib/tenant-context';
+import { AuthProvider } from '../lib/auth-context';
 
 export const metadata: Metadata = {
   title: 'LexiGuard Copilot | Enterprise AI Policy & Compliance Intelligence',
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased selection:bg-indigo-500 selection:text-white">
-        <TenantProvider>{children}</TenantProvider>
+        <AuthProvider>
+          <TenantProvider>{children}</TenantProvider>
+        </AuthProvider>
       </body>
     </html>
   );
