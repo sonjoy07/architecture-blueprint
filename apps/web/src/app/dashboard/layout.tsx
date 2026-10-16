@@ -10,19 +10,10 @@ import {
   ClipboardList,
   LogOut,
   ChevronDown,
-  Building2,
   Lock,
-  Layers,
-  Sparkles,
-  UserCheck,
-  Activity,
   User,
 } from 'lucide-react';
-import {
-  useAuthTenant,
-  CORPORATE_PERSONAS,
-  ROLE_DEFINITIONS,
-} from '../../context/AuthTenantContext';
+import { useAuthTenant } from '../../context/AuthTenantContext';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -31,9 +22,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isReady) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-200 space-y-4 font-mono text-xs">
-        <div className="w-8 h-8 rounded-full border-2 border-cyan-500/20 border-t-cyan-500 animate-spin" />
-        <p className="text-slate-500">Verifying Zero-Trust Session &amp; Shard Tokens...</p>
+      <div className="min-h-screen bg-[#0E1015] flex flex-col items-center justify-center text-[#8B949E] space-y-3 font-mono text-[12px]">
+        <div className="w-6 h-6 rounded-[2px] border border-[#252A36] border-t-[#58A6FF] animate-spin" />
+        <p className="text-[#8B949E]">Initializing cryptographic session tokens...</p>
       </div>
     );
   }
@@ -59,78 +50,81 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     },
   ];
 
-  const roleBadgeColor =
+  const roleBadgeStyle =
     user?.role === 'ORG_ADMIN'
-      ? 'bg-cyan-950 text-cyan-300 border-cyan-800'
+      ? 'bg-[#0C1C36] text-[#58A6FF] border-[#1F3A60]'
       : user?.role === 'COMPLIANCE_AUDITOR'
-      ? 'bg-amber-950 text-amber-300 border-amber-800'
-      : 'bg-slate-800 text-slate-300 border-slate-700';
+      ? 'bg-[#2E2208] text-[#E3B341] border-[#5E440E]'
+      : 'bg-[#1F232D] text-[#8B949E] border-[#30363D]';
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#0E1015] text-[#E6EDF3] flex flex-col font-sans select-none leading-tight">
       {/* Top Global Telemetry Strip */}
-      <div className="h-7 bg-slate-950 border-b border-slate-900 px-4 flex items-center justify-between text-[10px] font-mono text-slate-400">
+      <div className="h-7 bg-[#0E1015] border-b border-[#252A36] px-4 flex items-center justify-between text-[11px] font-mono text-[#8B949E]">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-[#3FB950] font-medium">
+            <span className="w-1.5 h-1.5 rounded-[1px] bg-[#238636]" />
             <span>SYS_KERNEL: NOMINAL</span>
           </div>
-          <span className="text-slate-700">|</span>
-          <div className="flex items-center gap-1.5 text-cyan-400">
-            <Lock className="w-3 h-3 text-cyan-500" />
-            <span>RLS_SHARD: {currentTenant.id.toUpperCase()}</span>
+          <span className="text-[#252A36]">|</span>
+          <div className="flex items-center gap-1.5 text-[#8B949E]">
+            <Lock className="w-3 h-3 text-[#58A6FF]" />
+            <span>RLS_SHARD: <strong className="text-[#E6EDF3]">{currentTenant.id.toUpperCase()}</strong></span>
           </div>
-          <span className="text-slate-700 hidden sm:inline">|</span>
-          <span className="text-slate-500 hidden sm:inline">
+          <span className="text-[#252A36] hidden sm:inline">|</span>
+          <span className="text-[#8B949E] hidden sm:inline">
             ENGINE: pgvector-16.2 / HNSW Cosine (1536-dim)
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-slate-500 hidden md:inline">
+          <span className="text-[#8B949E] hidden md:inline">
             PARTITION: {currentTenant.shardId || 'shard-us-east-4a'}
           </span>
-          <span className="text-slate-700 hidden md:inline">|</span>
-          <span className="text-slate-400 font-medium">SESSION: {user?.id || 'ANON'}</span>
+          <span className="text-[#252A36] hidden md:inline">|</span>
+          <span className="text-[#8B949E]">SESSION: {user?.id || 'ANON'}</span>
         </div>
       </div>
 
-      {/* Main Workspace with Left Sidebar & Content Area */}
+      {/* Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Fixed Navigation Sidebar */}
-        <aside className="w-64 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between shrink-0 font-mono text-xs">
+        <aside className="w-60 bg-[#161920] border-r border-[#252A36] flex flex-col justify-between shrink-0 font-mono text-[12px]">
           {/* Top Brand & Nav Section */}
-          <div className="p-4 space-y-6">
+          <div className="p-3.5 space-y-4">
             {/* Console Brand */}
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-              <div className="w-8 h-8 rounded bg-slate-950 border border-slate-700 flex items-center justify-center font-bold text-xs text-cyan-400 shadow-inner">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-[#252A36]">
+              <div className="w-7 h-7 rounded-[3px] bg-[#0E1015] border border-[#252A36] flex items-center justify-center font-bold text-[11px] text-[#58A6FF]">
                 LG
               </div>
               <div>
-                <span className="font-bold text-slate-100 text-sm tracking-tight block">
+                <span className="font-bold text-[#E6EDF3] text-[13px] tracking-tight block">
                   LEXIGUARD
                 </span>
-                <span className="text-[10px] text-slate-400 block -mt-0.5">
-                  B2B Compliance Vault
+                <span className="text-[10px] text-[#8B949E] block -mt-0.5">
+                  Policy Intelligence Console
                 </span>
               </div>
             </div>
 
             {/* Tenant Boundary Indicator */}
-            <div className="p-2.5 rounded bg-slate-950 border border-slate-800 space-y-1">
-              <div className="text-[9px] uppercase tracking-wider text-slate-500 font-bold flex items-center justify-between">
-                <span>Active Boundary</span>
-                <span className="text-emerald-400">CONNECTED</span>
+            <div className="p-2.5 rounded-[3px] bg-[#0E1015] border border-[#252A36] space-y-1">
+              <div className="text-[10px] uppercase tracking-wider text-[#8B949E] font-semibold flex items-center justify-between">
+                <span>Boundary Shard</span>
+                <span className="text-[#3FB950] font-mono text-[9px] flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-[1px] bg-[#238636]" />
+                  ACTIVE
+                </span>
               </div>
-              <div className="text-xs font-bold text-slate-200 font-sans truncate">
+              <div className="text-[12px] font-semibold text-[#E6EDF3] font-sans truncate">
                 {currentTenant.name}
               </div>
-              <div className="text-[10px] text-cyan-400 font-mono">{currentTenant.id}</div>
+              <div className="text-[10px] text-[#58A6FF] font-mono">{currentTenant.id}</div>
             </div>
 
             {/* Navigation Links */}
-            <nav className="space-y-1">
-              <div className="text-[10px] uppercase tracking-wider text-slate-500 px-2 py-1 font-bold">
+            <nav className="space-y-0.5">
+              <div className="text-[10px] uppercase tracking-wider text-[#484F58] px-2 py-1 font-bold">
                 Workstation Subsystems
               </div>
               {navItems.map((item) => {
@@ -140,17 +134,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-2 rounded text-xs transition-colors ${
+                    className={`flex items-center justify-between px-2.5 py-2 rounded-[3px] text-[12px] transition-colors ${
                       isActive
-                        ? 'bg-slate-800 text-cyan-300 font-bold border-l-2 border-cyan-400'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850 border-l-2 border-transparent'
+                        ? 'bg-[#1F232D] text-[#E6EDF3] font-semibold border-l-2 border-[#58A6FF]'
+                        : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#1F232D]/60 border-l-2 border-transparent'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
-                      <span>{item.label}</span>
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#58A6FF]' : 'text-[#8B949E]'}`} />
+                      <span className="font-sans text-[12px]">{item.label}</span>
                     </div>
-                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-950 border border-slate-800 text-slate-500">
+                    <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#8B949E]">
                       {item.badge}
                     </span>
                   </Link>
@@ -160,10 +154,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Bottom Session Switcher / Sign Out */}
-          <div className="p-3 border-t border-slate-800 bg-slate-950/90 relative">
+          <div className="p-3 border-t border-[#252A36] bg-[#161920] relative">
             {personaMenuOpen && (
-              <div className="absolute bottom-full left-3 right-3 mb-2 bg-slate-900 border border-slate-700 rounded-lg p-2 shadow-2xl space-y-1 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                <div className="px-2 py-1 text-[10px] text-slate-500 uppercase tracking-wider font-bold border-b border-slate-800 mb-1">
+              <div className="absolute bottom-full left-3 right-3 mb-2 bg-[#161920] border border-[#30363D] rounded-[4px] p-2 space-y-1 z-50 animate-in fade-in slide-in-from-bottom-1 duration-100 font-mono">
+                <div className="px-2 py-1 text-[10px] text-[#8B949E] uppercase tracking-wider font-semibold border-b border-[#252A36] mb-1">
                   Switch Corporate Persona
                 </div>
 
@@ -174,15 +168,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     loginAsPersona('sonjoy');
                     setPersonaMenuOpen(false);
                   }}
-                  className="w-full p-1.5 rounded hover:bg-slate-800 text-left text-[11px] flex items-center justify-between text-slate-200 cursor-pointer"
+                  className="w-full p-1.5 rounded-[3px] hover:bg-[#1F232D] text-left text-[11px] flex items-center justify-between text-[#E6EDF3] cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded bg-cyan-950 text-cyan-400 border border-cyan-700 flex items-center justify-center text-[10px] font-bold">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#0C1C36] text-[#58A6FF] border border-[#1F3A60] flex items-center justify-center text-[9px] font-bold">
                       SB
                     </span>
                     <span>Sonjoy Biswas</span>
                   </div>
-                  <span className="text-[9px] text-cyan-400 font-bold">ORG_ADMIN</span>
+                  <span className="text-[9px] text-[#58A6FF] font-bold">ORG_ADMIN</span>
                 </button>
 
                 {/* Persona 2: Dr. Sarah */}
@@ -192,15 +186,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     loginAsPersona('sarah');
                     setPersonaMenuOpen(false);
                   }}
-                  className="w-full p-1.5 rounded hover:bg-slate-800 text-left text-[11px] flex items-center justify-between text-slate-200 cursor-pointer"
+                  className="w-full p-1.5 rounded-[3px] hover:bg-[#1F232D] text-left text-[11px] flex items-center justify-between text-[#E6EDF3] cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded bg-amber-950 text-amber-400 border border-amber-700 flex items-center justify-center text-[10px] font-bold">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#2E2208] text-[#E3B341] border-[#5E440E] flex items-center justify-center text-[9px] font-bold">
                       SK
                     </span>
                     <span>Dr. Sarah Khan</span>
                   </div>
-                  <span className="text-[9px] text-amber-400 font-bold">AUDITOR</span>
+                  <span className="text-[9px] text-[#E3B341] font-bold">AUDITOR</span>
                 </button>
 
                 {/* Persona 3: Alex Rivera */}
@@ -210,27 +204,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     loginAsPersona('alex');
                     setPersonaMenuOpen(false);
                   }}
-                  className="w-full p-1.5 rounded hover:bg-slate-800 text-left text-[11px] flex items-center justify-between text-slate-200 cursor-pointer"
+                  className="w-full p-1.5 rounded-[3px] hover:bg-[#1F232D] text-left text-[11px] flex items-center justify-between text-[#E6EDF3] cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center text-[10px] font-bold">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#1F232D] text-[#8B949E] border border-[#30363D] flex items-center justify-center text-[9px] font-bold">
                       AR
                     </span>
                     <span>Alex Rivera</span>
                   </div>
-                  <span className="text-[9px] text-slate-400 font-bold">MEMBER</span>
+                  <span className="text-[9px] text-[#8B949E] font-bold">MEMBER</span>
                 </button>
 
-                <div className="border-t border-slate-800 my-1" />
+                <div className="border-t border-[#252A36] my-1" />
 
                 {/* Logout Button */}
                 <button
                   type="button"
                   onClick={logout}
-                  className="w-full p-1.5 rounded hover:bg-red-950/60 hover:text-red-300 text-slate-400 text-left text-[11px] flex items-center gap-2 transition-colors cursor-pointer"
+                  className="w-full p-1.5 rounded-[3px] hover:bg-[#2A1215] text-[#F85149] text-left text-[11px] flex items-center gap-2 transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5 text-red-400" />
-                  <span>Terminate Session &amp; Sign Out</span>
+                  <LogOut className="w-3.5 h-3.5 text-[#F85149]" />
+                  <span>Terminate Session (Sign Out)</span>
                 </button>
               </div>
             )}
@@ -239,29 +233,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               type="button"
               onClick={() => setPersonaMenuOpen(!personaMenuOpen)}
-              className="w-full p-2 rounded bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors flex items-center justify-between text-left cursor-pointer group"
+              className="w-full p-2 rounded-[3px] bg-[#0E1015] border border-[#252A36] hover:border-[#30363D] transition-colors flex items-center justify-between text-left cursor-pointer group"
             >
-              <div className="flex items-center gap-2.5 truncate">
-                <div className="w-7 h-7 rounded bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="flex items-center gap-2 truncate">
+                <div className="w-6 h-6 rounded-[2px] bg-[#1F232D] border border-[#30363D] text-[#E6EDF3] flex items-center justify-center font-bold text-[10px] shrink-0">
                   {user?.avatarText || 'ID'}
                 </div>
                 <div className="truncate">
-                  <div className="text-xs font-bold text-slate-200 font-sans truncate group-hover:text-cyan-300">
+                  <div className="text-[12px] font-semibold text-[#E6EDF3] font-sans truncate">
                     {user?.name || 'Corporate User'}
                   </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className={`text-[9px] px-1 py-0.1 rounded border font-mono font-bold ${roleBadgeColor}`}>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <span className={`text-[8px] px-1 py-0.1 rounded-[2px] border font-mono font-bold ${roleBadgeStyle}`}>
                       {user?.role || 'MEMBER'}
                     </span>
-                    <span className="text-[9px] text-slate-500 font-mono truncate">
+                    <span className="text-[9px] text-[#8B949E] font-mono truncate">
                       {user?.email ? user.email.split('@')[1] : 'internal'}
                     </span>
                   </div>
                 </div>
               </div>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
-                  personaMenuOpen ? 'rotate-180 text-cyan-400' : ''
+                className={`w-3.5 h-3.5 text-[#8B949E] transition-transform ${
+                  personaMenuOpen ? 'rotate-180 text-[#58A6FF]' : ''
                 }`}
               />
             </button>
@@ -269,7 +263,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         {/* Main Content Pane */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-slate-950">
+        <main className="flex-1 flex flex-col overflow-hidden bg-[#0E1015]">
           {children}
         </main>
       </div>

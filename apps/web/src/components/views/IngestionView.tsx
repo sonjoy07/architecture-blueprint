@@ -295,24 +295,24 @@ export function IngestionView() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 font-mono text-xs">
       {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#252A36] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-100 uppercase tracking-tight">
+            <span className="text-sm font-semibold text-[#E6EDF3] uppercase tracking-tight">
               Document Ingestion & Perimeter PII Scrubbing
             </span>
-            <span className="text-[10px] bg-slate-900 border border-slate-800 text-cyan-400 px-2 py-0.5 rounded font-bold">
+            <span className="text-[11px] bg-[#161920] border border-[#252A36] text-[#58A6FF] px-2 py-0.5 rounded-[3px] font-mono">
               {currentTenant.id}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-sans">
+          <p className="text-[11px] text-[#8B949E] mt-1 font-sans">
             Multi-stage ingestion pipeline: Document Parsing &rarr; Deterministic PII Redaction &rarr; HNSW 1536d Embedding &rarr; PostgreSQL RLS Commit.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-500 uppercase">Actor:</span>
-          <span className="text-[11px] font-bold text-slate-300 bg-slate-900 px-2 py-1 rounded border border-slate-800">
+          <span className="text-[10px] text-[#484F58] uppercase">Actor:</span>
+          <span className="text-[11px] font-medium text-[#C9D1D9] bg-[#161920] px-2 py-1 rounded-[3px] border border-[#252A36]">
             {user?.name || 'Authorized Session'} ({user?.role || 'MEMBER'})
           </span>
         </div>
@@ -320,17 +320,17 @@ export function IngestionView() {
 
       {/* Role-Gated 403 Forbidden Banner for Non-Admin */}
       {!canIngest ? (
-        <div className="p-6 rounded-xl border border-rose-900/60 bg-rose-950/20 text-rose-300 space-y-3">
-          <div className="flex items-center gap-2.5 font-bold text-sm text-rose-400">
-            <ShieldAlert className="w-5 h-5 text-rose-500" />
+        <div className="p-5 rounded-[4px] border border-[#DA3633]/40 bg-[#DA3633]/10 text-[#F85149] space-y-2.5">
+          <div className="flex items-center gap-2 font-semibold text-xs text-[#F85149]">
+            <ShieldAlert className="w-4 h-4 text-[#F85149]" />
             <span>403 Forbidden: Insufficient Tenant Permissions</span>
           </div>
-          <p className="text-xs text-rose-200/80 font-sans leading-relaxed">
-            Your current assigned role (<code>{user?.role || 'MEMBER'}</code>) lacks write authorization (<code>documents:write</code>) on partition{' '}
-            <strong className="text-white">{currentTenant.id}</strong>. Ingestion triggers, file deletion, and direct index mutations are restricted strictly to{' '}
-            <strong>Organization Administrators (<code>ORG_ADMIN</code>)</strong>.
+          <p className="text-xs text-[#8B949E] font-sans leading-relaxed">
+            Your current assigned role (<code className="bg-[#0D0F14] px-1 py-0.5 rounded-[3px] border border-[#252A36] text-[#E6EDF3]">{user?.role || 'MEMBER'}</code>) lacks write authorization (<code className="bg-[#0D0F14] px-1 py-0.5 rounded-[3px] border border-[#252A36] text-[#58A6FF]">documents:write</code>) on partition{' '}
+            <strong className="text-[#E6EDF3]">{currentTenant.id}</strong>. Ingestion triggers, file deletion, and direct index mutations are restricted strictly to{' '}
+            <strong className="text-[#E6EDF3]">Organization Administrators (<code>ORG_ADMIN</code>)</strong>.
           </p>
-          <div className="pt-2 text-[11px] text-slate-400">
+          <div className="pt-1 text-[11px] text-[#484F58]">
             <em>To test document ingestion, switch your active role to <code>ORG_ADMIN</code> in the top console navigation bar.</em>
           </div>
         </div>
@@ -339,14 +339,14 @@ export function IngestionView() {
         <div className="space-y-6">
           {/* Multi-Stage Pipeline Telemetry Card (Active when uploading) */}
           {activeUpload && (
-            <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/90 shadow-xl space-y-4 animate-in fade-in">
-              <div className="flex items-center justify-between border-b border-slate-850 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                  <span className="font-bold text-slate-100">{activeUpload.fileName}</span>
-                  <span className="text-slate-500">({activeUpload.fileSize})</span>
+            <div className="p-4 rounded-[4px] border border-[#252A36] bg-[#161920] space-y-3">
+              <div className="flex items-center justify-between border-b border-[#252A36] pb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2 h-2 rounded-[2px] bg-[#58A6FF] animate-pulse" />
+                  <span className="font-semibold text-[#E6EDF3]">{activeUpload.fileName}</span>
+                  <span className="text-[#8B949E] tabular-nums">({activeUpload.fileSize})</span>
                 </div>
-                <span className="text-cyan-400 font-bold">PIPELINE STAGE {activeUpload.stage}/4</span>
+                <span className="text-[#58A6FF] font-mono text-xs font-semibold">PIPELINE STAGE {activeUpload.stage}/4</span>
               </div>
 
               {/* 4 Pipeline Stages */}
@@ -362,33 +362,33 @@ export function IngestionView() {
                   return (
                     <div
                       key={s.stage}
-                      className={`p-2.5 rounded border ${
+                      className={`p-2.5 rounded-[3px] border ${
                         isCurrent
-                          ? 'border-cyan-500/80 bg-cyan-950/20 text-cyan-300'
+                          ? 'border-[#58A6FF] bg-[#58A6FF]/10 text-[#58A6FF]'
                           : isDone
-                          ? 'border-emerald-800/60 bg-emerald-950/20 text-emerald-300'
-                          : 'border-slate-800 bg-slate-950/60 text-slate-500'
+                          ? 'border-[#238636]/60 bg-[#238636]/10 text-[#3FB950]'
+                          : 'border-[#252A36] bg-[#0E1015] text-[#484F58]'
                       }`}
                     >
-                      <div className="flex items-center justify-between font-bold">
+                      <div className="flex items-center justify-between font-semibold">
                         <span>{s.title}</span>
                         {isDone ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#3FB950]" />
                         ) : isCurrent ? (
-                          <Clock className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+                          <Clock className="w-3.5 h-3.5 text-[#58A6FF] animate-spin" />
                         ) : (
                           <span className="text-[9px]">PENDING</span>
                         )}
                       </div>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">{s.desc}</span>
+                      <span className="text-[10px] text-[#8B949E] block mt-0.5">{s.desc}</span>
                     </div>
                   );
                 })}
               </div>
 
               {/* Live Terminal stdout Feed */}
-              <div className="p-3 rounded-lg bg-black border border-slate-850 font-mono text-[10px] space-y-1 text-slate-300 max-h-48 overflow-y-auto">
-                <div className="text-slate-500 border-b border-slate-900 pb-1 mb-1">
+              <div className="p-3 rounded-[3px] bg-[#0A0C10] border border-[#252A36] font-mono text-[10px] space-y-1 text-[#8B949E] max-h-48 overflow-y-auto">
+                <div className="text-[#484F58] border-b border-[#252A36] pb-1 mb-1">
                   $ tail -f /var/log/lexiguard/ingest_worker.stdout
                 </div>
                 {activeUpload.logs.map((log, idx) => (
@@ -418,22 +418,22 @@ export function IngestionView() {
                 });
               }
             }}
-            className={`border border-dashed rounded-xl p-6 text-center transition-all bg-slate-950 ${
+            className={`border border-dashed rounded-[4px] p-6 text-center transition-all bg-[#161920] ${
               isDragging
-                ? 'border-cyan-500 bg-cyan-950/10'
-                : 'border-slate-800 hover:border-slate-700'
+                ? 'border-[#58A6FF] bg-[#58A6FF]/5'
+                : 'border-[#252A36] hover:border-[#30363D]'
             }`}
           >
             <div className="max-w-md mx-auto space-y-2">
-              <UploadCloud className="w-8 h-8 text-cyan-500 mx-auto" />
-              <div className="text-slate-200 font-semibold">
+              <UploadCloud className="w-8 h-8 text-[#58A6FF] mx-auto" />
+              <div className="text-[#E6EDF3] font-semibold text-xs">
                 Drag and drop corporate policy documents (.PDF, .TXT)
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#8B949E] font-sans">
                 Automatic zero-egress perimeter redaction enforces Luhn algorithm (PCI DSS) and Bangladesh National ID (10/13/17-digit) masking prior to vector embedding generation.
               </p>
               <div className="pt-2 flex items-center justify-center gap-3">
-                <label className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer border border-slate-700">
+                <label className="px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] text-[#C9D1D9] cursor-pointer border border-[#30363D] text-xs transition-colors">
                   Select File
                   <input
                     type="file"
@@ -458,7 +458,7 @@ export function IngestionView() {
                       size: '14.2 MB',
                     })
                   }
-                  className="px-3 py-1.5 rounded bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-800/60 cursor-pointer"
+                  className="px-3 py-1.5 rounded-[3px] bg-[#1F232D] hover:bg-[#252A36] text-[#58A6FF] border border-[#252A36] cursor-pointer text-xs transition-colors"
                 >
                   Simulate Sample Ingestion
                 </button>
@@ -469,105 +469,105 @@ export function IngestionView() {
       )}
 
       {/* Catalog Table Header */}
-      <div className="rounded-xl border border-slate-800 bg-slate-950 overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/60">
+      <div className="rounded-[4px] border border-[#252A36] bg-[#161920] overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[#252A36] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#12141A]">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-200 uppercase">
+            <span className="font-semibold text-[#E6EDF3] uppercase text-xs">
               Indexed Documents ({filteredDocs.length})
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-[#8B949E] font-mono">
               [Partition: {currentTenant.id}]
             </span>
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
             <input
               type="text"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
               placeholder="Search document registry..."
-              className="w-full bg-slate-900 border border-slate-800 rounded pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-hidden focus:border-cyan-500"
+              className="w-full bg-[#0D0F14] border border-[#252A36] rounded-[3px] pl-8 pr-3 py-1 text-xs text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF]"
             />
           </div>
         </div>
 
         {/* Data-Dense Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[500px]">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-900/80 text-slate-400 text-[10px] uppercase font-semibold border-b border-slate-800">
+            <thead className="sticky top-0 z-10 bg-[#12141A] text-[#8B949E] text-[10px] uppercase font-semibold border-b border-[#252A36]">
               <tr>
-                <th className="px-4 py-2.5">Document Title & Hash</th>
-                <th className="px-4 py-2.5">Status</th>
-                <th className="px-4 py-2.5">Passages (1536d)</th>
-                <th className="px-4 py-2.5">PII Entities Scrubbed</th>
-                <th className="px-4 py-2.5">Indexed At (UTC)</th>
-                <th className="px-4 py-2.5 text-right">Actions</th>
+                <th className="px-4 py-2">Document Title & Hash</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Passages (1536d)</th>
+                <th className="px-4 py-2">PII Entities Scrubbed</th>
+                <th className="px-4 py-2">Indexed At (UTC)</th>
+                <th className="px-4 py-2 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-850 text-[11px]">
+            <tbody className="divide-y divide-[#252A36] text-[11px]">
               {filteredDocs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-[#8B949E] font-sans">
                     No documents indexed in this tenant partition.
                   </td>
                 </tr>
               ) : (
                 filteredDocs.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-slate-900/40 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-slate-200 truncate max-w-sm sm:max-w-md">
+                  <tr key={doc.id} className="odd:bg-[#161920] even:bg-[#12141A]/50 hover:bg-[#1F232D]/70 transition-colors">
+                    <td className="px-4 py-2.5">
+                      <div className="font-medium text-[#E6EDF3] truncate max-w-sm sm:max-w-md">
                         {doc.title}
                       </div>
-                      <div className="text-[9px] text-slate-500 font-mono mt-0.5">
-                        SHA-256: {doc.sha256Hash} • {doc.fileSize}
+                      <div className="text-[10px] text-[#8B949E] font-mono mt-0.5">
+                        SHA-256: {doc.sha256Hash} • <span className="tabular-nums">{doc.fileSize}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <td className="px-4 py-2.5">
+                      <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-[3px] text-[10px] font-semibold bg-[#238636]/15 text-[#3FB950] border border-[#238636]/40">
+                        <span className="w-1.5 h-1.5 rounded-[1px] bg-[#3FB950]" />
                         {doc.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-300 font-mono">
+                    <td className="px-4 py-2.5 text-[#E6EDF3] font-mono tabular-nums">
                       {doc.chunks} chunks
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-2.5">
                       {doc.piiAudit ? (
                         <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
                           {doc.piiAudit.phoneNumbers > 0 && (
-                            <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                            <span className="px-1.5 py-0.5 rounded-[3px] bg-[#21262D] text-[#C9D1D9] border border-[#30363D] tabular-nums">
                               {doc.piiAudit.phoneNumbers} Phone
                             </span>
                           )}
                           {doc.piiAudit.nationalIds > 0 && (
-                            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+                            <span className="px-1.5 py-0.5 rounded-[3px] bg-[#58A6FF]/10 text-[#58A6FF] border border-[#58A6FF]/30 tabular-nums">
                               {doc.piiAudit.nationalIds} NID
                             </span>
                           )}
                           {doc.piiAudit.emails > 0 && (
-                            <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                            <span className="px-1.5 py-0.5 rounded-[3px] bg-[#21262D] text-[#C9D1D9] border border-[#30363D] tabular-nums">
                               {doc.piiAudit.emails} Email
                             </span>
                           )}
                           {doc.piiAudit.creditCards > 0 && (
-                            <span className="px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800/60">
+                            <span className="px-1.5 py-0.5 rounded-[3px] bg-[#D29922]/15 text-[#E3B341] border border-[#D29922]/40 tabular-nums">
                               {doc.piiAudit.creditCards} PCI
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-slate-500">None</span>
+                        <span className="text-[#8B949E]">None</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-400">
+                    <td className="px-4 py-2.5 text-[#8B949E] tabular-nums">
                       {new Date(doc.createdAt).toISOString().replace('T', ' ').slice(0, 19)}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-2.5 text-right">
                       {canIngest && (
                         <button
                           onClick={() => handleDelete(doc.id)}
-                          className="p-1 rounded text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition-colors cursor-pointer"
+                          className="p-1 rounded-[3px] text-[#8B949E] hover:text-[#F85149] hover:bg-[#DA3633]/20 transition-colors cursor-pointer"
                           title="Purge Document Chunk Partition"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

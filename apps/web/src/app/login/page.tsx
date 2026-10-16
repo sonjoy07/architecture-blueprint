@@ -3,19 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ShieldCheck,
   Lock,
   ArrowRight,
   Terminal,
-  Building2,
   KeyRound,
-  CheckCircle2,
   AlertCircle,
-  Briefcase,
-  Layers,
-  Fingerprint,
 } from 'lucide-react';
-import { useAuthTenant, CORPORATE_PERSONAS } from '../../context/AuthTenantContext';
+import { useAuthTenant } from '../../context/AuthTenantContext';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,7 +19,6 @@ export default function LoginPage() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  // If already authenticated, redirect to /dashboard/copilot
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/dashboard/copilot');
@@ -38,7 +31,7 @@ export default function LoginPage() {
     loginAsPersona(personaKey);
     setTimeout(() => {
       router.push('/dashboard/copilot');
-    }, 250);
+    }, 200);
   };
 
   const handleSsoSubmit = (e: React.FormEvent) => {
@@ -53,7 +46,6 @@ export default function LoginPage() {
     setIsAuthenticating(true);
     setAuthError('');
 
-    // Determine tenant by email domain
     const isAcme = ssoEmail.includes('acme');
     loginWithSso(
       ssoEmail.trim(),
@@ -63,69 +55,69 @@ export default function LoginPage() {
 
     setTimeout(() => {
       router.push('/dashboard/copilot');
-    }, 350);
+    }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 select-none font-sans">
+    <div className="min-h-screen bg-[#0E1015] text-[#E6EDF3] flex flex-col justify-center items-center p-4 select-none font-sans leading-tight">
       {/* Container */}
-      <div className="w-full max-w-xl space-y-6">
+      <div className="w-full max-w-lg space-y-4">
         {/* Brand Terminal Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-slate-900 border border-slate-800 text-xs font-mono text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-slate-300 font-semibold uppercase tracking-wider">
-              Zero-Trust Identity Broker // Gateway
+        <div className="text-center space-y-1.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-[2px] bg-[#161920] border border-[#252A36] text-[10px] font-mono text-[#8B949E]">
+            <span className="w-1.5 h-1.5 rounded-[1px] bg-[#238636]" />
+            <span className="text-[#8B949E] font-semibold uppercase tracking-wider">
+              Zero-Trust Identity Gateway // SAML 2.0
             </span>
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100 font-mono">
-            LEXIGUARD <span className="text-cyan-400">POLICY CONSOLE</span>
+          <h1 className="text-[18px] font-bold tracking-tight text-[#E6EDF3] font-mono">
+            LEXIGUARD <span className="text-[#58A6FF]">POLICY CONSOLE</span>
           </h1>
-          <p className="text-xs text-slate-400 font-sans max-w-md mx-auto">
-            Mandatory Single-Tenant Authentication Gate. All access is cryptographically bound to customer RLS shards with immutable audit trails.
+          <p className="text-[12px] text-[#8B949E] font-sans max-w-md mx-auto">
+            Mandatory Single-Tenant Authentication Gate. Access is cryptographically bound to customer RLS shards.
           </p>
         </div>
 
         {/* Industrial Authentication Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 shadow-2xl space-y-6 font-mono text-xs">
+        <div className="bg-[#161920] border border-[#252A36] rounded-[4px] p-5 space-y-4 font-mono text-[12px]">
           {/* Persona Switcher Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                Select Enterprise Persona (Instant IAM Token)
+          <div className="space-y-2">
+            <div className="flex items-center justify-between border-b border-[#252A36] pb-1.5">
+              <span className="text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider flex items-center gap-1.5">
+                <Terminal className="w-3 h-3 text-[#58A6FF]" />
+                Select Enterprise Persona (Instant IAM Session)
               </span>
-              <span className="text-[10px] text-slate-500">Demo Environment</span>
+              <span className="text-[9px] text-[#484F58]">Simulated IdP</span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {/* Persona 1: Sonjoy Biswas (ORG_ADMIN) */}
               <button
                 type="button"
                 onClick={() => handlePersonaSelect('sonjoy')}
                 disabled={isAuthenticating}
-                className="w-full p-3.5 rounded bg-slate-950 hover:bg-slate-850 border border-slate-800 hover:border-cyan-500/80 text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
+                className="w-full p-2.5 rounded-[3px] bg-[#0D0F14] hover:bg-[#1F232D] border border-[#252A36] hover:border-[#30363D] text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded bg-cyan-950/80 border border-cyan-700/60 text-cyan-400 flex items-center justify-center font-bold text-xs shrink-0 font-mono">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-[2px] bg-[#0C1C36] border border-[#1F3A60] text-[#58A6FF] flex items-center justify-center font-bold text-[10px] shrink-0 font-mono">
                     SB
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-100 text-xs font-sans">Sonjoy Biswas</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-bold">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-[#E6EDF3] text-[12px] font-sans">Sonjoy Biswas</span>
+                      <span className="text-[8px] font-mono px-1 py-0.1 rounded-[2px] bg-[#0C1C36] border border-[#1F3A60] text-[#58A6FF] font-bold">
                         ORG_ADMIN
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
+                    <div className="text-[10px] text-[#8B949E] font-mono mt-0.5 flex items-center gap-1.5">
                       <span>t_acme_corp</span>
-                      <span className="text-slate-600">&middot;</span>
-                      <span className="text-slate-300">Infra &amp; Org Administrator</span>
+                      <span className="text-[#484F58]">&middot;</span>
+                      <span>Infra &amp; Org Administrator</span>
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#484F58] group-hover:text-[#58A6FF] transition-all shrink-0 ml-2" />
               </button>
 
               {/* Persona 2: Dr. Sarah Khan (COMPLIANCE_AUDITOR) */}
@@ -133,27 +125,27 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => handlePersonaSelect('sarah')}
                 disabled={isAuthenticating}
-                className="w-full p-3.5 rounded bg-slate-950 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/80 text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
+                className="w-full p-2.5 rounded-[3px] bg-[#0D0F14] hover:bg-[#1F232D] border border-[#252A36] hover:border-[#30363D] text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded bg-amber-950/80 border border-amber-700/60 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0 font-mono">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-[2px] bg-[#2E2208] border border-[#5E440E] text-[#E3B341] flex items-center justify-center font-bold text-[10px] shrink-0 font-mono">
                     SK
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-100 text-xs font-sans">Dr. Sarah Khan</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-950 border border-amber-800 text-amber-300 font-bold">
-                        COMPLIANCE_AUDITOR
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-[#E6EDF3] text-[12px] font-sans">Dr. Sarah Khan</span>
+                      <span className="text-[8px] font-mono px-1 py-0.1 rounded-[2px] bg-[#2E2208] border border-[#5E440E] text-[#E3B341] font-bold">
+                        AUDITOR
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
+                    <div className="text-[10px] text-[#8B949E] font-mono mt-0.5 flex items-center gap-1.5">
                       <span>t_acme_corp</span>
-                      <span className="text-slate-600">&middot;</span>
-                      <span className="text-slate-300">Chief Compliance Officer</span>
+                      <span className="text-[#484F58]">&middot;</span>
+                      <span>Chief Compliance Officer</span>
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#484F58] group-hover:text-[#E3B341] transition-all shrink-0 ml-2" />
               </button>
 
               {/* Persona 3: Alex Rivera (MEMBER) */}
@@ -161,50 +153,50 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => handlePersonaSelect('alex')}
                 disabled={isAuthenticating}
-                className="w-full p-3.5 rounded bg-slate-950 hover:bg-slate-850 border border-slate-800 hover:border-slate-600 text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
+                className="w-full p-2.5 rounded-[3px] bg-[#0D0F14] hover:bg-[#1F232D] border border-[#252A36] hover:border-[#30363D] text-left transition-all flex items-center justify-between group cursor-pointer disabled:opacity-50"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded bg-slate-850 border border-slate-700 text-slate-300 flex items-center justify-center font-bold text-xs shrink-0 font-mono">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-[2px] bg-[#1F232D] border border-[#30363D] text-[#8B949E] flex items-center justify-center font-bold text-[10px] shrink-0 font-mono">
                     AR
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-100 text-xs font-sans">Alex Rivera</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 border border-slate-700 text-slate-300 font-bold">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-[#E6EDF3] text-[12px] font-sans">Alex Rivera</span>
+                      <span className="text-[8px] font-mono px-1 py-0.1 rounded-[2px] bg-[#1F232D] border border-[#30363D] text-[#8B949E] font-bold">
                         MEMBER
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
+                    <div className="text-[10px] text-[#8B949E] font-mono mt-0.5 flex items-center gap-1.5">
                       <span>t_nexus_health</span>
-                      <span className="text-slate-600">&middot;</span>
-                      <span className="text-slate-300">External Health Consultant</span>
+                      <span className="text-[#484F58]">&middot;</span>
+                      <span>External Health Consultant</span>
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-slate-300 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#484F58] group-hover:text-[#E6EDF3] transition-all shrink-0 ml-2" />
               </button>
             </div>
           </div>
 
           {/* Divider */}
           <div className="relative flex items-center justify-center">
-            <div className="border-t border-slate-800 w-full" />
-            <span className="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-widest relative shrink-0">
+            <div className="border-t border-[#252A36] w-full" />
+            <span className="bg-[#161920] px-2 text-[9px] font-mono text-[#484F58] uppercase tracking-widest relative shrink-0">
               Or Federated Okta / SAML
             </span>
           </div>
 
           {/* Enterprise SSO Form */}
-          <form onSubmit={handleSsoSubmit} className="space-y-3">
+          <form onSubmit={handleSsoSubmit} className="space-y-2.5">
             {authError && (
-              <div className="p-2.5 rounded bg-rose-950/60 border border-rose-800 text-rose-300 text-[11px] flex items-center gap-2 font-mono">
-                <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+              <div className="p-2 rounded-[2px] bg-[#2A1215] border border-[#DA3633]/60 text-[#F85149] text-[10px] flex items-center gap-1.5 font-mono">
+                <AlertCircle className="w-3 h-3 shrink-0 text-[#F85149]" />
                 <span>{authError}</span>
               </div>
             )}
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider text-slate-400 block font-mono">
+              <label className="text-[10px] uppercase tracking-wider text-[#8B949E] block font-mono">
                 Corporate Identity Address
               </label>
               <input
@@ -214,34 +206,33 @@ export default function LoginPage() {
                 onChange={(e) => setSsoEmail(e.target.value)}
                 placeholder="identity@organization.internal"
                 disabled={isAuthenticating}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono"
+                className="w-full bg-[#0D0F14] border border-[#30363D] rounded-[3px] px-2.5 py-1.5 text-[12px] text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF] font-mono"
               />
             </div>
 
             <button
               type="submit"
               disabled={!ssoEmail.trim() || isAuthenticating}
-              className="w-full py-2.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 hover:border-slate-600 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50 font-mono"
+              className="w-full py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] text-[#C9D1D9] border border-[#30363D] font-medium text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 font-mono"
             >
-              <KeyRound className="w-3.5 h-3.5 text-cyan-400" />
+              <KeyRound className="w-3 h-3 text-[#58A6FF]" />
               <span>{isAuthenticating ? 'Exchanging Okta Assertions...' : 'Sign in with Okta / SAML'}</span>
             </button>
           </form>
 
           {/* Security Guarantee Strip */}
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-            <span className="flex items-center gap-1.5">
-              <Lock className="w-3 h-3 text-emerald-400" />
-              <span>FIDO2 WebAuthn / SAML 2.0 Bound</span>
+          <div className="pt-2 border-t border-[#252A36] flex items-center justify-between text-[10px] text-[#484F58] font-mono">
+            <span className="flex items-center gap-1 text-[#8B949E]">
+              <Lock className="w-2.5 h-2.5 text-[#3FB950]" />
+              <span>FIDO2 WebAuthn Enforced</span>
             </span>
-            <span>TOKEN_TTL: 28800s</span>
+            <span className="tabular-nums">TTL: 28800s</span>
           </div>
         </div>
 
-        {/* Footer Audit Information */}
-        <div className="text-center text-[10px] text-slate-600 font-mono space-y-0.5">
+        {/* Footer */}
+        <div className="text-center text-[10px] text-[#484F58] font-mono space-y-0.5">
           <p>LEXIGUARD B2B KERNEL &middot; ROW-LEVEL POSTGRESQL SHARDING ACTIVE</p>
-          <p>All unauthorized attempts are intercepted and recorded to immutable compliance ledgers.</p>
         </div>
       </div>
     </div>

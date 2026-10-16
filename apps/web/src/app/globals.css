@@ -3,19 +3,99 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --canvas: #0E1015;
+  --surface: #161920;
+  --focus: #1F232D;
+  --border: #252A36;
+  --border-muted: #30363D;
+  --primary: #E6EDF3;
+  --secondary: #8B949E;
+  --muted: #484F58;
+
+  --color-healthy: #238636;
+  --color-healthy-text: #3FB950;
+  --color-warning: #D29922;
+  --color-warning-text: #E3B341;
+  --color-critical: #DA3633;
+  --color-critical-text: #F85149;
+  --color-accent: #2F81F7;
+  --color-accent-text: #58A6FF;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #020617;
-    --foreground: #f8fafc;
-  }
+* {
+  box-sizing: border-box;
 }
 
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  background-color: #0E1015;
+  color: #E6EDF3;
+  font-family: var(--font-plex-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.38;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular Numerals for Monospace Metrics */
+.font-mono,
+code,
+pre,
+kbd {
+  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Zero Drop Shadows - Strict Industrial Flat Borders */
+.shadow-xl,
+.shadow-2xl,
+.shadow-lg {
+  box-shadow: none !important;
+}
+
+/* Minimal Matte Scrollbar matching Grafana/Sentry */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0E1015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252A36;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #30363D;
+}
+
+/* Enterprise Input Reset */
+input,
+textarea,
+select {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #58A6FF !important;
+  box-shadow: 0 0 0 1px #58A6FF !important;
+}
+
+/* Table Utilities */
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-color: #252A36;
 }

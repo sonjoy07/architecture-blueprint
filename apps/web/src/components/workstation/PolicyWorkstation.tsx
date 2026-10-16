@@ -6,22 +6,13 @@ import {
   Terminal,
   ShieldCheck,
   CheckCircle2,
-  Clock,
-  Layers,
   Lock,
   BookOpen,
   Send,
-  Square,
   Copy,
   Check,
   Download,
-  Filter,
   FileText,
-  ChevronRight,
-  Database,
-  ArrowRight,
-  ExternalLink,
-  Sparkles,
 } from 'lucide-react';
 import { useAuthTenant } from '../../context/AuthTenantContext';
 import { CitationItem } from '../../types';
@@ -240,12 +231,10 @@ interface InvestigationRecord {
 export function PolicyWorkstation() {
   const { currentTenant, user } = useAuthTenant();
 
-  // Active policies for current tenant
   const activePolicies = useMemo(() => {
     return TENANT_POLICIES[currentTenant.id] || TENANT_POLICIES['t_acme_corp'];
   }, [currentTenant.id]);
 
-  // State
   const [policySearch, setPolicySearch] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<PolicyDocumentMetadata | null>(null);
   const [pinnedCitation, setPinnedCitation] = useState<CitationItem>(activePolicies[0].defaultChunk);
@@ -253,7 +242,6 @@ export function PolicyWorkstation() {
   const [inputQuery, setInputQuery] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
 
-  // Investigation history keyed by tenant
   const [investigations, setInvestigations] = useState<InvestigationRecord[]>([
     {
       id: 'inv-init-01',
@@ -281,13 +269,11 @@ export function PolicyWorkstation() {
   const queryInputRef = useRef<HTMLInputElement>(null);
   const terminalFeedEndRef = useRef<HTMLDivElement>(null);
 
-  // Reset default chunk when tenant switches
   useEffect(() => {
     setSelectedPolicy(null);
     setPinnedCitation(activePolicies[0].defaultChunk);
   }, [activePolicies]);
 
-  // Keyboard shortcut Cmd+K / Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -299,7 +285,6 @@ export function PolicyWorkstation() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filtered policies
   const filteredPolicies = useMemo(() => {
     if (!policySearch.trim()) return activePolicies;
     const term = policySearch.toLowerCase();
@@ -311,7 +296,6 @@ export function PolicyWorkstation() {
     );
   }, [activePolicies, policySearch]);
 
-  // Execute structured query
   const handleExecuteQuery = async (queryText: string) => {
     const trimmed = queryText.trim();
     if (!trimmed || isExecuting) return;
@@ -322,7 +306,6 @@ export function PolicyWorkstation() {
     const isAcme = currentTenant.id === 't_acme_corp';
     const qLower = trimmed.toLowerCase();
 
-    // Select matched policy and chunk
     let matchedPolicy = selectedPolicy || activePolicies[0];
     if (!selectedPolicy) {
       if (isAcme) {
@@ -386,11 +369,10 @@ export function PolicyWorkstation() {
     setInvestigations((prev) => [...prev, newRecord]);
     setPinnedCitation(citation);
 
-    // Simulate streaming tokens into synthesis terminal
     const chunks = generatedText.split(' ');
     let currentText = '';
     for (let i = 0; i < chunks.length; i++) {
-      await new Promise((r) => setTimeout(r, 40));
+      await new Promise((r) => setTimeout(r, 35));
       currentText += (i === 0 ? '' : ' ') + chunks[i];
       setInvestigations((prev) =>
         prev.map((r) => (r.id === invId ? { ...r, synthesis: currentText } : r))
@@ -434,53 +416,53 @@ export function PolicyWorkstation() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-3.5rem)] bg-slate-950 text-slate-200 select-none overflow-hidden font-mono text-xs">
+    <div className="flex-1 flex flex-col h-[calc(100vh-1.75rem)] bg-[#0E1015] text-[#E6EDF3] select-none overflow-hidden font-mono text-[12px] leading-tight">
       {/* 3-Column Workstation Container */}
-      <div className="flex-1 grid grid-cols-12 divide-x divide-slate-800 h-full overflow-hidden">
+      <div className="flex-1 grid grid-cols-12 divide-x divide-[#252A36] h-full overflow-hidden">
         {/* ========================================================= */}
         {/* LEFT COLUMN (25% - 3 cols): ACTIVE POLICY INDEX */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-slate-950 h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#0E1015] h-full overflow-hidden">
           {/* Column Header */}
-          <div className="p-3 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+          <div className="p-2.5 border-b border-[#252A36] bg-[#161920] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-cyan-400" />
-              <span className="font-bold text-slate-100 text-[11px] uppercase tracking-wider">
+              <BookOpen className="w-3.5 h-3.5 text-[#58A6FF]" />
+              <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
                 Policy Index Ledger
               </span>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">
+            <span className="text-[10px] text-[#8B949E] font-mono tabular-nums">
               {filteredPolicies.length} Active
             </span>
           </div>
 
           {/* Search Bar */}
-          <div className="p-2.5 border-b border-slate-800 bg-slate-950">
+          <div className="p-2 border-b border-[#252A36] bg-[#0E1015]">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+              <Search className="w-3 h-3 text-[#8B949E] absolute left-2.5 top-2.5" />
               <input
                 type="text"
                 value={policySearch}
                 onChange={(e) => setPolicySearch(e.target.value)}
-                placeholder="Filter policies by code or tag..."
-                className="w-full bg-slate-900 border border-slate-800 rounded pl-8 pr-2.5 py-1.5 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono"
+                placeholder="Filter policies by code..."
+                className="w-full bg-[#0D0F14] border border-[#30363D] rounded-[3px] pl-7 pr-2.5 py-1 text-[11px] text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF] font-mono"
               />
             </div>
             {selectedPolicy && (
-              <div className="mt-2 flex items-center justify-between bg-cyan-950/60 border border-cyan-800/80 rounded px-2 py-1 text-[10px] text-cyan-300">
+              <div className="mt-1.5 flex items-center justify-between bg-[#161920] border border-[#252A36] rounded-[2px] px-2 py-0.5 text-[10px] text-[#58A6FF]">
                 <span>Scope: {selectedPolicy.code}</span>
                 <button
                   onClick={() => setSelectedPolicy(null)}
-                  className="text-slate-400 hover:text-slate-100 cursor-pointer underline"
+                  className="text-[#8B949E] hover:text-[#E6EDF3] cursor-pointer"
                 >
-                  Clear Scope
+                  Clear
                 </button>
               </div>
             )}
           </div>
 
           {/* Policy List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-850 p-1">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#252A36]/60 p-1">
             {filteredPolicies.map((pol) => {
               const isSelected = selectedPolicy?.id === pol.id;
               return (
@@ -490,30 +472,30 @@ export function PolicyWorkstation() {
                     setSelectedPolicy(pol);
                     setPinnedCitation(pol.defaultChunk);
                   }}
-                  className={`p-3 transition-colors cursor-pointer rounded group ${
+                  className={`p-2.5 transition-colors cursor-pointer rounded-[2px] group ${
                     isSelected
-                      ? 'bg-slate-900 border-l-2 border-cyan-400'
-                      : 'hover:bg-slate-900/70 border-l-2 border-transparent'
+                      ? 'bg-[#1F232D] border-l-2 border-[#58A6FF]'
+                      : 'hover:bg-[#161920] border-l-2 border-transparent'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-200 text-[11px] font-mono group-hover:text-cyan-300">
+                    <span className="font-bold text-[#E6EDF3] text-[11px] font-mono group-hover:text-[#58A6FF]">
                       {pol.code}
                     </span>
-                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 border border-slate-700 text-slate-400 font-bold">
+                    <span className="text-[9px] px-1 py-0.2 rounded-[2px] bg-[#161920] border border-[#30363D] text-[#8B949E] font-medium">
                       {pol.version}
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-300 font-sans line-clamp-1 mb-2 font-medium">
+                  <div className="text-[12px] text-[#8B949E] group-hover:text-[#E6EDF3] font-sans line-clamp-1 mb-1.5">
                     {pol.title}
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                    <span className="px-1.5 py-0.2 rounded bg-slate-950 border border-slate-800 text-cyan-400 text-[9px]">
+                  <div className="flex items-center justify-between text-[10px] text-[#8B949E] font-mono">
+                    <span className="px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#8B949E] text-[9px]">
                       {pol.tag}
                     </span>
-                    <span>{pol.chunkCount} Chunks &middot; {pol.lastSynced}</span>
+                    <span className="tabular-nums">{pol.chunkCount} Chunks &middot; {pol.lastSynced}</span>
                   </div>
                 </div>
               );
@@ -521,79 +503,78 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Left Footer Shard Status */}
-          <div className="p-2.5 border-t border-slate-800 bg-slate-900/60 text-[10px] text-slate-400 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <Lock className="w-3 h-3 text-emerald-400" />
-              <span>RLS BOUNDARY VERIFIED</span>
+          <div className="p-2 border-t border-[#252A36] bg-[#161920] text-[10px] text-[#8B949E] flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-[#3FB950] font-medium">
+              <Lock className="w-2.5 h-2.5 text-[#3FB950]" />
+              <span>RLS VERIFIED</span>
             </span>
-            <span className="text-slate-500">{currentTenant.id}</span>
+            <span className="text-[#8B949E]">{currentTenant.id}</span>
           </div>
         </div>
 
         {/* ========================================================= */}
         {/* CENTER COLUMN (50% - 6 cols): STRUCTURED INVESTIGATION TERMINAL */}
         {/* ========================================================= */}
-        <div className="col-span-6 flex flex-col bg-slate-950 h-full overflow-hidden">
+        <div className="col-span-6 flex flex-col bg-[#0E1015] h-full overflow-hidden">
           {/* Telemetry Header */}
-          <div className="h-10 border-b border-slate-800 bg-slate-900/80 px-4 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-3">
-              <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-bold uppercase tracking-wider text-[11px] text-slate-200">
+          <div className="h-9 border-b border-[#252A36] bg-[#161920] px-3.5 flex items-center justify-between text-[11px]">
+            <div className="flex items-center gap-2.5">
+              <Terminal className="w-3.5 h-3.5 text-[#58A6FF]" />
+              <span className="font-semibold uppercase tracking-wider text-[#E6EDF3]">
                 Investigation Terminal
               </span>
-              <span className="text-slate-700">|</span>
-              <span className="text-[10px] text-slate-400">
-                SCOPE: <strong className="text-cyan-400">{selectedPolicy ? selectedPolicy.code : 'TENANT_ALL'}</strong>
+              <span className="text-[#252A36]">|</span>
+              <span className="text-[10px] text-[#8B949E]">
+                SCOPE: <strong className="text-[#58A6FF] font-semibold">{selectedPolicy ? selectedPolicy.code : 'TENANT_ALL'}</strong>
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px]">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-slate-400 hidden sm:inline">HNSW-1536 Cosine Engine</span>
+            <div className="flex items-center gap-2 text-[10px] text-[#8B949E]">
+              <span className="w-1.5 h-1.5 rounded-[1px] bg-[#238636]" />
+              <span className="hidden sm:inline">HNSW-1536 Cosine Engine</span>
             </div>
           </div>
 
           {/* Investigation Output Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-5 scroll-smooth">
+          <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 scroll-smooth">
             {investigations.map((inv) => (
               <div
                 key={inv.id}
-                className="bg-slate-900/80 border border-slate-800 rounded p-4 space-y-3 font-mono text-xs shadow-lg"
+                className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3 space-y-2.5 font-mono text-[12px]"
               >
                 {/* Query Header */}
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-[10px] text-slate-400">
+                <div className="flex items-center justify-between border-b border-[#252A36] pb-1.5 text-[10px] text-[#8B949E]">
                   <div className="flex items-center gap-2">
-                    <span className="text-cyan-400 font-bold uppercase">DISPATCH // {inv.id}</span>
-                    <span className="text-slate-600">&middot;</span>
-                    <span>{inv.timestamp}</span>
+                    <span className="text-[#58A6FF] font-semibold uppercase">DISPATCH // {inv.id}</span>
+                    <span className="text-[#484F58]">&middot;</span>
+                    <span className="tabular-nums">{inv.timestamp}</span>
                   </div>
-                  <span className="text-slate-400">{user ? user.email : 'system-session'}</span>
+                  <span className="text-[#8B949E]">{user ? user.email : 'system-session'}</span>
                 </div>
 
                 {/* SQL/Terminal Style Query Block */}
-                <div className="bg-slate-950 p-2.5 rounded border border-slate-850 space-y-1">
-                  <div className="text-[10px] text-slate-500">
+                <div className="bg-[#0E1015] p-2 rounded-[2px] border border-[#252A36] space-y-0.5">
+                  <div className="text-[10px] text-[#484F58]">
                     &gt; SELECT ground_truth, synthesis FROM {currentTenant.id}.policies WHERE scope = &apos;{inv.scopedPolicyCode || 'ALL'}&apos;
                   </div>
-                  <div className="text-xs text-slate-200 font-semibold font-sans">
+                  <div className="text-[12px] text-[#E6EDF3] font-sans">
                     &ldquo;{inv.query}&rdquo;
                   </div>
                 </div>
 
                 {/* Synthesis Output Block */}
-                <div className="space-y-2 pt-1">
+                <div className="space-y-1.5 pt-0.5">
                   <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      SYNTHESIZED POLICY DIRECTIVE &middot; FAITHFULNESS {inv.telemetry.faithfulnessScore}%
+                    <span className="text-[#3FB950] font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-[#238636]" />
+                      SYNTHESIZED DIRECTIVE &middot; FAITHFULNESS {inv.telemetry.faithfulnessScore}%
                     </span>
-                    <span className="text-slate-500 font-mono">
-                      TTFT: {inv.telemetry.ttftMs}ms &middot; Total: {inv.telemetry.latencyMs}ms
+                    <span className="text-[#8B949E] font-mono tabular-nums">
+                      TTFT: {inv.telemetry.ttftMs}ms &middot; Latency: {inv.telemetry.latencyMs}ms
                     </span>
                   </div>
 
-                  <div className="bg-slate-950/60 p-3 rounded border border-slate-800 text-slate-200 text-xs font-sans leading-relaxed whitespace-pre-wrap">
-                    {/* Render text with inline clickable citation tokens */}
+                  <div className="bg-[#0E1015] p-2.5 rounded-[2px] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap">
                     {inv.synthesis.split(/(\[REF-[A-Z]+-\d+\])/g).map((chunk, i) => {
                       if (chunk.startsWith('[REF-')) {
                         return (
@@ -603,10 +584,10 @@ export function PolicyWorkstation() {
                               const found = inv.citations[0] || activePolicies[0].defaultChunk;
                               setPinnedCitation(found);
                             }}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 mx-1 rounded bg-slate-900 border border-cyan-800 hover:border-cyan-400 text-cyan-300 font-mono text-[10px] cursor-pointer transition-colors shadow-2xs"
-                            title="Click to inspect verified ground-truth chunk in right inspector"
+                            className="inline-flex items-center gap-1 px-1 py-0.2 mx-1 rounded-[2px] bg-[#161920] border border-[#30363D] hover:border-[#58A6FF] text-[#58A6FF] font-mono text-[10px] cursor-pointer transition-colors"
+                            title="Inspect ground-truth chunk in right inspector"
                           >
-                            <BookOpen className="w-2.5 h-2.5 text-cyan-400" />
+                            <BookOpen className="w-2.5 h-2.5" />
                             <span>{chunk}</span>
                           </button>
                         );
@@ -614,18 +595,18 @@ export function PolicyWorkstation() {
                       return chunk;
                     })}
                     {inv.isStreaming && (
-                      <span className="inline-block w-2 h-3.5 ml-1 bg-cyan-400 animate-pulse align-middle" />
+                      <span className="inline-block w-1.5 h-3 ml-1 bg-[#58A6FF] animate-pulse align-middle" />
                     )}
                   </div>
                 </div>
 
-                {/* Cryptographic Grounding Signature */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-[10px] text-slate-500">
+                {/* Grounding Signature */}
+                <div className="flex items-center justify-between pt-1.5 border-t border-[#252A36] text-[10px] text-[#8B949E]">
                   <span className="flex items-center gap-1.5 font-mono">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Cryptographic Grounding Verified (Zero-Egress Guaranteed)</span>
+                    <ShieldCheck className="w-3 h-3 text-[#3FB950]" />
+                    <span>Cryptographic Grounding Verified</span>
                   </span>
-                  <span className="font-mono">Vectors Scanned: {inv.telemetry.vectorsScanned}</span>
+                  <span className="font-mono tabular-nums">Vectors: {inv.telemetry.vectorsScanned}</span>
                 </div>
               </div>
             ))}
@@ -633,27 +614,27 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Quick Query Selector Chips */}
-          <div className="px-4 py-2 border-t border-slate-850 bg-slate-950 flex flex-wrap gap-2 text-xs">
-            <span className="text-[10px] text-slate-500 self-center font-mono uppercase mr-1">
-              Sample Inquiries:
+          <div className="px-3 py-1.5 border-t border-[#252A36] bg-[#0E1015] flex flex-wrap gap-1.5 text-[11px]">
+            <span className="text-[10px] text-[#484F58] self-center font-mono uppercase mr-1">
+              Inquiries:
             </span>
             {(currentTenant.id === 't_acme_corp'
               ? [
                   'Production MFA and WebAuthn access rules',
-                  'Meal per diem limits and receipt submission deadlines',
+                  'Meal per diem limits and receipt deadlines',
                   'Anti-bribery FCPA threshold for vendor gifts',
                 ]
               : [
                   'Mandatory ePHI access controls & break-glass SOP',
                   'HITECH 7-year statutory retention & key shredding',
-                  'Vendor BAA and SOC 2 compliance requirements',
+                  'Vendor BAA and SOC 2 requirements',
                 ]
             ).map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleExecuteQuery(q)}
                 disabled={isExecuting}
-                className="text-[11px] font-sans px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-cyan-600/80 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer truncate max-w-xs disabled:opacity-50"
+                className="text-[11px] font-sans px-2 py-0.5 rounded-[2px] bg-[#161920] border border-[#252A36] hover:border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors cursor-pointer truncate max-w-xs disabled:opacity-50"
               >
                 &ldquo;{q}&rdquo;
               </button>
@@ -661,7 +642,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Prompt Terminal Input */}
-          <div className="p-3 border-t border-slate-800 bg-slate-900/90">
+          <div className="p-2.5 border-t border-[#252A36] bg-[#161920]">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -670,7 +651,7 @@ export function PolicyWorkstation() {
               className="flex items-center gap-2"
             >
               <div className="relative flex-1">
-                <div className="absolute left-3 top-2.5 text-cyan-400 text-xs font-mono font-bold select-none">
+                <div className="absolute left-2.5 top-2 text-[#58A6FF] text-[11px] font-mono font-bold select-none">
                   &gt;
                 </div>
                 <input
@@ -678,11 +659,11 @@ export function PolicyWorkstation() {
                   type="text"
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
-                  placeholder={`Execute policy investigation query on ${currentTenant.name} (Cmd+K)...`}
+                  placeholder={`Execute policy query on ${currentTenant.name} (Cmd+K)...`}
                   disabled={isExecuting}
-                  className="w-full bg-slate-950 border border-slate-800 rounded pl-7 pr-20 py-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono disabled:opacity-60"
+                  className="w-full bg-[#0D0F14] border border-[#30363D] rounded-[3px] pl-6 pr-16 py-1.5 text-[12px] text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF] font-mono disabled:opacity-60"
                 />
-                <div className="absolute right-2.5 top-2.5 text-[10px] text-slate-500 font-mono hidden sm:inline">
+                <div className="absolute right-2 top-2 text-[10px] text-[#484F58] font-mono hidden sm:inline">
                   Enter ↵
                 </div>
               </div>
@@ -690,10 +671,10 @@ export function PolicyWorkstation() {
               <button
                 type="submit"
                 disabled={!inputQuery.trim() || isExecuting}
-                className="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-600 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#C9D1D9] font-medium text-[11px] font-mono flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
               >
                 <span>Execute</span>
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-3 h-3 text-[#58A6FF]" />
               </button>
             </form>
           </div>
@@ -702,109 +683,109 @@ export function PolicyWorkstation() {
         {/* ========================================================= */}
         {/* RIGHT COLUMN (25% - 3 cols): FIXED GROUND-TRUTH INSPECTOR */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-slate-950 h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#0E1015] h-full overflow-hidden">
           {/* Header */}
-          <div className="p-3 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="font-bold text-slate-100 text-[11px] uppercase tracking-wider">
+          <div className="p-2.5 border-b border-[#252A36] bg-[#161920] flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#3FB950]" />
+              <span className="font-semibold text-[#E6EDF3] text-[11px] uppercase tracking-wider">
                 Ground-Truth Inspector
               </span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-900 border border-slate-700 text-cyan-400 font-mono">
+            <span className="text-[10px] px-1 py-0.2 rounded-[2px] bg-[#0E1015] border border-[#252A36] text-[#58A6FF] font-mono">
               CHUNK #{pinnedCitation.chunkId}
             </span>
           </div>
 
           {/* Inspector Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
             {/* Document Title & Section */}
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
+            <div className="space-y-0.5">
+              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
                 Source Document
               </span>
-              <div className="text-xs text-slate-100 font-semibold font-sans">
+              <div className="text-[12px] text-[#E6EDF3] font-semibold font-sans">
                 {pinnedCitation.documentTitle}
               </div>
-              <div className="text-[10px] text-cyan-400 font-mono">
+              <div className="text-[10px] text-[#58A6FF] font-mono">
                 {pinnedCitation.section || 'General Governance Clause'}
               </div>
             </div>
 
             {/* Verification Metadata Box */}
-            <div className="bg-slate-900 border border-slate-800 rounded p-3 space-y-2 text-[11px] font-mono">
+            <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-2.5 space-y-1.5 text-[11px] font-mono">
               <div className="flex justify-between">
-                <span className="text-slate-500">Document Page:</span>
-                <span className="text-slate-200 font-bold">Page {pinnedCitation.page}</span>
+                <span className="text-[#8B949E]">Page:</span>
+                <span className="text-[#E6EDF3] font-semibold tabular-nums">Page {pinnedCitation.page}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Cosine Distance:</span>
-                <span className="text-emerald-400 font-bold">
+                <span className="text-[#8B949E]">Cosine Distance:</span>
+                <span className="text-[#3FB950] font-semibold tabular-nums">
                   {(1 - pinnedCitation.similarityScore).toFixed(4)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Similarity Metric:</span>
-                <span className="text-slate-200">
+                <span className="text-[#8B949E]">Similarity Metric:</span>
+                <span className="text-[#E6EDF3] tabular-nums">
                   {(pinnedCitation.similarityScore * 100).toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Tenant Boundary:</span>
-                <span className="text-cyan-400 font-semibold">{currentTenant.id}</span>
+                <span className="text-[#8B949E]">Tenant Boundary:</span>
+                <span className="text-[#58A6FF] font-medium">{currentTenant.id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Shard Partition:</span>
-                <span className="text-slate-300">{currentTenant.shardId || 'shard-us-east-4a'}</span>
+                <span className="text-[#8B949E]">Shard Partition:</span>
+                <span className="text-[#E6EDF3]">{currentTenant.shardId || 'shard-us-east-4a'}</span>
               </div>
             </div>
 
             {/* Source SHA-256 Hash */}
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
-                Cryptographic Chunk Hash (SHA-256)
+            <div className="space-y-0.5">
+              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
+                Chunk SHA-256 Hash
               </span>
-              <div className="p-2 rounded bg-slate-900 border border-slate-800 text-[10px] text-slate-400 font-mono break-all">
+              <div className="p-2 rounded-[2px] bg-[#161920] border border-[#252A36] text-[10px] text-[#8B949E] font-mono break-all leading-tight">
                 {activePolicies.find((p) => p.title.includes(pinnedCitation.documentTitle))
                   ?.sha256Hash || 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'}
               </div>
             </div>
 
             {/* Verbatim Source Passage */}
-            <div className="space-y-1.5">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
+            <div className="space-y-1">
+              <span className="text-[10px] text-[#484F58] uppercase tracking-wider block font-semibold">
                 Verbatim Extracted Chunk
               </span>
-              <div className="p-3 rounded bg-slate-900/90 border border-slate-800 text-slate-200 font-sans text-xs leading-relaxed whitespace-pre-wrap select-text">
+              <div className="p-2.5 rounded-[3px] bg-[#161920] border border-[#252A36] text-[#E6EDF3] font-sans text-[12px] leading-relaxed whitespace-pre-wrap select-text">
                 &ldquo;{pinnedCitation.rawText}&rdquo;
               </div>
             </div>
           </div>
 
           {/* Action Footer */}
-          <div className="p-3 border-t border-slate-800 bg-slate-900/60 flex items-center gap-2">
+          <div className="p-2.5 border-t border-[#252A36] bg-[#161920] flex items-center gap-1.5">
             <button
               onClick={copyChunk}
-              className="flex-1 py-1.5 px-2.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="flex-1 py-1 px-2 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#C9D1D9] text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               {copiedCitation ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3 h-3 text-[#3FB950]" />
                   <span>Copied</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" />
+                  <Copy className="w-3 h-3 text-[#8B949E]" />
                   <span>Copy Passage</span>
                 </>
               )}
             </button>
             <button
               onClick={downloadCertificate}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+              className="p-1 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors cursor-pointer"
               title="Download Signed Proof JSON"
             >
-              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <Download className="w-3.5 h-3.5 text-[#58A6FF]" />
             </button>
           </div>
         </div>

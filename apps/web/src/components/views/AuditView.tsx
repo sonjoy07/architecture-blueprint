@@ -224,49 +224,49 @@ export function AuditView() {
   // 403 Forbidden Gate for MEMBER role
   if (!canReadAudit) {
     return (
-      <div className="flex-1 bg-slate-950 p-6 flex items-center justify-center">
-        <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-lg p-6 font-mono text-xs shadow-2xl">
-          <div className="flex items-center gap-3 text-red-400 mb-4 pb-3 border-b border-slate-800">
+      <div className="flex-1 bg-[#0E1015] p-6 flex items-center justify-center">
+        <div className="max-w-xl w-full bg-[#161920] border border-[#252A36] rounded-[4px] p-6 font-mono text-xs">
+          <div className="flex items-center gap-3 text-[#F85149] mb-4 pb-3 border-b border-[#252A36]">
             <ShieldAlert className="w-5 h-5 flex-shrink-0" />
             <div>
-              <div className="font-bold text-sm tracking-wide">403 FORBIDDEN: INSUFFICIENT AUDIT CLEARANCE</div>
-              <div className="text-[10px] text-slate-400">ERROR_CODE: E_RBAC_INSUFFICIENT_SCOPE (audit:read required)</div>
+              <div className="font-semibold text-sm tracking-wide uppercase text-[#E6EDF3]">403 FORBIDDEN: INSUFFICIENT AUDIT CLEARANCE</div>
+              <div className="text-[10px] text-[#8B949E]">ERROR_CODE: E_RBAC_INSUFFICIENT_SCOPE (audit:read required)</div>
             </div>
           </div>
 
-          <p className="text-slate-300 text-xs mb-4 leading-relaxed font-sans">
-            Your current assigned enterprise role <span className="text-red-400 font-mono font-bold">[{user?.role || 'MEMBER'}]</span> has zero authorization to access the cryptographic PII scrubbing ledger or compliance event tables. This view requires the <code className="bg-slate-950 px-1 py-0.5 rounded border border-slate-700 text-cyan-400">audit:read</code> permission.
+          <p className="text-[#8B949E] text-xs mb-4 leading-relaxed font-sans">
+            Your current assigned enterprise role <span className="text-[#F85149] font-mono font-semibold">[{user?.role || 'MEMBER'}]</span> has zero authorization to access the cryptographic PII scrubbing ledger or compliance event tables. This view requires the <code className="bg-[#0D0F14] px-1 py-0.5 rounded-[3px] border border-[#252A36] text-[#58A6FF]">audit:read</code> permission.
           </p>
 
-          <div className="bg-slate-950 p-3 rounded border border-slate-800 mb-5 space-y-1.5 text-[11px]">
-            <div className="flex justify-between text-slate-400">
+          <div className="bg-[#0D0F14] p-3 rounded-[3px] border border-[#252A36] mb-5 space-y-1.5 text-[11px]">
+            <div className="flex justify-between text-[#8B949E]">
               <span>Active Tenant:</span>
-              <span className="text-slate-200">{currentTenant.name} ({currentTenant.id})</span>
+              <span className="text-[#E6EDF3]">{currentTenant.name} ({currentTenant.id})</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-[#8B949E]">
               <span>Assigned Identity:</span>
-              <span className="text-slate-200">{user?.email || 'anonymous-session'}</span>
+              <span className="text-[#E6EDF3]">{user?.email || 'anonymous-session'}</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-[#8B949E]">
               <span>Authorized Roles:</span>
-              <span className="text-emerald-400">COMPLIANCE_AUDITOR, ORG_ADMIN</span>
+              <span className="text-[#3FB950]">COMPLIANCE_AUDITOR, ORG_ADMIN</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-[10px] text-slate-500 font-sans">
+          <div className="flex items-center justify-between pt-2 border-t border-[#252A36]">
+            <span className="text-[10px] text-[#484F58] font-sans">
               Switch role simulator in header or select below:
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => switchRole('COMPLIANCE_AUDITOR')}
-                className="px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold border border-cyan-400 text-xs cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-[3px] bg-[#238636] hover:bg-[#2EA043] text-white font-medium border border-[#2EA043]/50 text-xs cursor-pointer transition-colors"
               >
                 Switch to COMPLIANCE_AUDITOR
               </button>
               <button
                 onClick={() => switchRole('ORG_ADMIN')}
-                className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] text-[#C9D1D9] border border-[#30363D] text-xs cursor-pointer transition-colors"
               >
                 Switch to ORG_ADMIN
               </button>
@@ -278,19 +278,19 @@ export function AuditView() {
   }
 
   return (
-    <div className="flex-1 bg-slate-950 text-slate-200 p-4 sm:p-6 space-y-5 font-mono text-xs select-none">
+    <div className="flex-1 bg-[#0E1015] text-[#E6EDF3] p-4 sm:p-6 space-y-4 font-mono text-xs select-none">
       {/* Top Banner & Telemetry Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-[#252A36]">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold text-slate-100 tracking-tight font-mono uppercase">
+            <h1 className="text-sm font-semibold text-[#E6EDF3] tracking-tight font-mono uppercase">
               Compliance &amp; PII Scrubbing Ledger
             </h1>
-            <span className="text-[10px] bg-slate-900 border border-slate-700 text-cyan-400 px-2 py-0.5 rounded font-mono">
+            <span className="text-[11px] bg-[#161920] border border-[#252A36] text-[#58A6FF] px-2 py-0.5 rounded-[3px] font-mono">
               TENANT: {currentTenant.id}
             </span>
           </div>
-          <p className="text-xs text-slate-400 font-sans mt-0.5">
+          <p className="text-[11px] text-[#8B949E] font-sans mt-0.5">
             Immutable write-once log of deterministic PII interceptions, masking rules, and zero-egress perimeter validations.
           </p>
         </div>
@@ -298,10 +298,10 @@ export function AuditView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleExportJson}
-            className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-750 hover:border-slate-600 text-xs transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] text-[#C9D1D9] border border-[#30363D] text-xs transition-colors cursor-pointer"
             title="Download immutable ledger in JSON format"
           >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
+            <Download className="w-3.5 h-3.5 text-[#58A6FF]" />
             <span>Export Ledger (.JSON)</span>
           </button>
         </div>
@@ -309,60 +309,60 @@ export function AuditView() {
 
       {/* Industrial Metric Tiles */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-slate-900/90 border border-slate-800 rounded p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3">
+          <div className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>Total Scrubbed Entities</span>
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#3FB950]" />
           </div>
-          <div className="text-lg font-bold text-slate-100 font-mono">{metrics.total}</div>
-          <div className="text-[10px] text-emerald-400 mt-1 font-sans">100% Zero-Egress Passed</div>
+          <div className="text-lg font-semibold text-[#E6EDF3] font-mono tabular-nums">{metrics.total}</div>
+          <div className="text-[10px] text-[#3FB950] mt-1 font-sans">100% Zero-Egress Passed</div>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3">
+          <div className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>National IDs / SSN Scrubbed</span>
-            <Lock className="w-3.5 h-3.5 text-cyan-400" />
+            <Lock className="w-3.5 h-3.5 text-[#58A6FF]" />
           </div>
-          <div className="text-lg font-bold text-cyan-400 font-mono">{metrics.nidOrSsn}</div>
-          <div className="text-[10px] text-slate-400 mt-1 font-sans">BD NID &amp; US SSN Masked</div>
+          <div className="text-lg font-semibold text-[#58A6FF] font-mono tabular-nums">{metrics.nidOrSsn}</div>
+          <div className="text-[10px] text-[#8B949E] mt-1 font-sans">BD NID &amp; US SSN Masked</div>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3">
+          <div className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>PCI Cardholder Redactions</span>
-            <Layers className="w-3.5 h-3.5 text-amber-400" />
+            <Layers className="w-3.5 h-3.5 text-[#E3B341]" />
           </div>
-          <div className="text-lg font-bold text-amber-400 font-mono">{metrics.cards}</div>
-          <div className="text-[10px] text-slate-400 mt-1 font-sans">Luhn 16-Digit Sanitized</div>
+          <div className="text-lg font-semibold text-[#E3B341] font-mono tabular-nums">{metrics.cards}</div>
+          <div className="text-[10px] text-[#8B949E] mt-1 font-sans">Luhn 16-Digit Sanitized</div>
         </div>
 
-        <div className="bg-slate-900/90 border border-slate-800 rounded p-3">
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-3">
+          <div className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>E164 Phone Numbers</span>
-            <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+            <Terminal className="w-3.5 h-3.5 text-[#8B949E]" />
           </div>
-          <div className="text-lg font-bold text-indigo-400 font-mono">{metrics.phone}</div>
-          <div className="text-[10px] text-slate-400 mt-1 font-sans">ITU E.164 Global Formats</div>
+          <div className="text-lg font-semibold text-[#E6EDF3] font-mono tabular-nums">{metrics.phone}</div>
+          <div className="text-[10px] text-[#8B949E] mt-1 font-sans">ITU E.164 Global Formats</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded p-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#161920] border border-[#252A36] rounded-[3px] p-2.5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
           <div className="relative w-full max-w-md">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#8B949E] absolute left-2.5 top-2.5" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by rule, invoker, masked pattern, or doc title..."
-              className="w-full bg-slate-950 border border-slate-800 rounded pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              className="w-full bg-[#0D0F14] border border-[#252A36] rounded-[3px] pl-8 pr-3 py-1.5 text-xs text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#58A6FF]"
             />
           </div>
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="p-1 rounded text-slate-400 hover:text-slate-200 text-xs cursor-pointer"
+              className="p-1 rounded-[3px] text-[#8B949E] hover:text-[#E6EDF3] text-xs cursor-pointer"
             >
               Clear
             </button>
@@ -370,15 +370,15 @@ export function AuditView() {
         </div>
 
         <div className="flex items-center gap-1.5 overflow-x-auto text-[11px]">
-          <span className="text-slate-500 mr-1 uppercase text-[10px]">Filter:</span>
+          <span className="text-[#484F58] mr-1 uppercase text-[10px]">Filter:</span>
           {['ALL', 'NID_BD', 'PHONE', 'EMAIL', 'CREDIT_CARD_PCI', 'SSN'].map((type) => (
             <button
               key={type}
               onClick={() => setSelectedEntityType(type)}
-              className={`px-2 py-1 rounded transition-colors cursor-pointer font-mono ${
+              className={`px-2 py-1 rounded-[3px] transition-colors cursor-pointer font-mono ${
                 selectedEntityType === type
-                  ? 'bg-cyan-950 border border-cyan-700 text-cyan-300 font-bold'
-                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  ? 'bg-[#1F232D] border border-[#58A6FF]/60 text-[#58A6FF] font-semibold'
+                  : 'bg-[#0D0F14] border border-[#252A36] text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#161920]'
               }`}
             >
               {type}
@@ -388,25 +388,25 @@ export function AuditView() {
       </div>
 
       {/* Dense Redacted Log Events Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
+      <div className="bg-[#161920] border border-[#252A36] rounded-[3px] overflow-hidden">
+        <div className="overflow-x-auto max-h-[520px]">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-950 text-slate-400 text-[10px] uppercase tracking-wider border-b border-slate-800 font-mono">
-                <th className="py-2.5 px-3">Timestamp (UTC)</th>
-                <th className="py-2.5 px-3">Entity Type</th>
-                <th className="py-2.5 px-3">Masked Preview</th>
-                <th className="py-2.5 px-3">Detection Rule</th>
-                <th className="py-2.5 px-3">Document Origin</th>
-                <th className="py-2.5 px-3">Invoker Identity</th>
-                <th className="py-2.5 px-3">Conf.</th>
-                <th className="py-2.5 px-3 text-right">Actions</th>
+            <thead className="sticky top-0 z-10 bg-[#12141A] text-[#8B949E] text-[10px] uppercase tracking-wider border-b border-[#252A36] font-mono">
+              <tr>
+                <th className="py-2 px-3">Timestamp (UTC)</th>
+                <th className="py-2 px-3">Entity Type</th>
+                <th className="py-2 px-3">Masked Preview</th>
+                <th className="py-2 px-3">Detection Rule</th>
+                <th className="py-2 px-3">Document Origin</th>
+                <th className="py-2 px-3">Invoker Identity</th>
+                <th className="py-2 px-3">Conf.</th>
+                <th className="py-2 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+            <tbody className="divide-y divide-[#252A36] font-mono text-[11px]">
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500 font-sans">
+                  <td colSpan={8} className="py-8 text-center text-[#8B949E] font-sans">
                     No PII redaction events match the current filter criteria for {currentTenant.id}.
                   </td>
                 </tr>
@@ -414,60 +414,60 @@ export function AuditView() {
                 filteredLogs.map((evt) => {
                   const badgeColor =
                     evt.entityType === 'NID_BD' || evt.entityType === 'SSN'
-                      ? 'bg-cyan-950/80 text-cyan-400 border-cyan-800'
+                      ? 'bg-[#58A6FF]/10 text-[#58A6FF] border-[#58A6FF]/30'
                       : evt.entityType === 'CREDIT_CARD_PCI'
-                      ? 'bg-amber-950/80 text-amber-400 border-amber-800'
+                      ? 'bg-[#D29922]/15 text-[#E3B341] border-[#D29922]/40'
                       : evt.entityType === 'PHONE'
-                      ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800'
-                      : 'bg-indigo-950/80 text-indigo-400 border-indigo-800';
+                      ? 'bg-[#238636]/15 text-[#3FB950] border-[#238636]/40'
+                      : 'bg-[#21262D] text-[#C9D1D9] border-[#30363D]';
 
                   return (
                     <tr
                       key={evt.id}
-                      className="hover:bg-slate-850/60 transition-colors group cursor-pointer"
+                      className="odd:bg-[#161920] even:bg-[#12141A]/50 hover:bg-[#1F232D]/70 transition-colors group cursor-pointer"
                       onClick={() => setSelectedEvent(evt)}
                     >
-                      <td className="py-2.5 px-3 text-slate-400 whitespace-nowrap text-[10px]">
+                      <td className="py-2 px-3 text-[#8B949E] whitespace-nowrap text-[10px] tabular-nums">
                         {evt.timestamp.replace('T', ' ').replace('Z', '')}
                       </td>
-                      <td className="py-2.5 px-3 whitespace-nowrap">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] border ${badgeColor} font-bold`}>
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        <span className={`px-1.5 py-0.5 rounded-[3px] text-[10px] border ${badgeColor} font-semibold`}>
                           {evt.entityType}
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-200 whitespace-nowrap">
-                        <code className="bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 text-emerald-300">
+                      <td className="py-2 px-3 font-semibold text-[#E6EDF3] whitespace-nowrap">
+                        <code className="bg-[#0D0F14] px-1.5 py-0.5 rounded-[3px] border border-[#252A36] text-[#3FB950]">
                           {evt.originalMasked}
                         </code>
                       </td>
-                      <td className="py-2.5 px-3 text-slate-300 whitespace-nowrap truncate max-w-xs">
+                      <td className="py-2 px-3 text-[#C9D1D9] whitespace-nowrap truncate max-w-xs">
                         {evt.detectionRule}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-400 truncate max-w-xs font-sans text-xs" title={evt.documentTitle}>
+                      <td className="py-2 px-3 text-[#8B949E] truncate max-w-xs font-sans text-xs" title={evt.documentTitle}>
                         {evt.documentTitle}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-400 whitespace-nowrap text-[10px]">
+                      <td className="py-2 px-3 text-[#8B949E] whitespace-nowrap text-[10px]">
                         {evt.userId}
                       </td>
-                      <td className="py-2.5 px-3 text-emerald-400 font-bold whitespace-nowrap">
+                      <td className="py-2 px-3 text-[#3FB950] font-semibold whitespace-nowrap tabular-nums">
                         {evt.confidenceScore}%
                       </td>
-                      <td className="py-2.5 px-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                      <td className="py-2 px-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => copyToClipboard(evt.originalMasked, evt.id)}
-                            className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
+                            className="p-1 rounded-[3px] text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D] transition-colors cursor-pointer"
                             title="Copy masked token"
                           >
                             {copiedId === evt.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-[#3FB950]" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
                           </button>
                           <button
                             onClick={() => setSelectedEvent(evt)}
-                            className="p-1 rounded text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors cursor-pointer"
+                            className="p-1 rounded-[3px] text-[#58A6FF] hover:text-[#58A6FF]/80 hover:bg-[#21262D] transition-colors cursor-pointer"
                             title="Inspect Raw Event JSON"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -483,9 +483,9 @@ export function AuditView() {
         </div>
 
         {/* Footer Ledger Metadata */}
-        <div className="p-3 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between text-[10px] text-slate-500">
+        <div className="p-2.5 bg-[#12141A] border-t border-[#252A36] flex flex-wrap items-center justify-between text-[10px] text-[#8B949E]">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="w-1.5 h-1.5 rounded-[1px] bg-[#3FB950]" />
             <span>IMMUTABLE WRITE-ONCE COMPLIANCE LEDGER (HMAC-SHA256 SIGNED)</span>
           </div>
           <div>
@@ -496,44 +496,44 @@ export function AuditView() {
 
       {/* Raw Audit Event Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-lg shadow-2xl p-5 text-xs font-mono space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75">
+          <div className="w-full max-w-2xl bg-[#161920] border border-[#252A36] rounded-[4px] p-5 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between border-b border-[#252A36] pb-2.5">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
-                <span className="font-bold text-slate-100 text-sm">Audit Record Inspection // {selectedEvent.id}</span>
+                <Terminal className="w-4 h-4 text-[#58A6FF]" />
+                <span className="font-semibold text-[#E6EDF3] text-xs">Audit Record Inspection // {selectedEvent.id}</span>
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-100 cursor-pointer"
+                className="p-1 rounded-[3px] text-[#8B949E] hover:text-[#E6EDF3] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-2 text-[11px]">
-              <div className="grid grid-cols-2 gap-2 bg-slate-950 p-3 rounded border border-slate-850">
+              <div className="grid grid-cols-2 gap-2 bg-[#0D0F14] p-3 rounded-[3px] border border-[#252A36]">
                 <div>
-                  <span className="text-slate-500 block">Event Identifier:</span>
-                  <span className="text-slate-200 font-bold">{selectedEvent.id}</span>
+                  <span className="text-[#8B949E] block">Event Identifier:</span>
+                  <span className="text-[#E6EDF3] font-semibold">{selectedEvent.id}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Logged Timestamp:</span>
-                  <span className="text-slate-200">{selectedEvent.timestamp}</span>
+                  <span className="text-[#8B949E] block">Logged Timestamp:</span>
+                  <span className="text-[#E6EDF3] tabular-nums">{selectedEvent.timestamp}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Tenant Isolation Shard:</span>
-                  <span className="text-cyan-400">{selectedEvent.shardPartition}</span>
+                  <span className="text-[#8B949E] block">Tenant Isolation Shard:</span>
+                  <span className="text-[#58A6FF]">{selectedEvent.shardPartition}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">Detection Confidence:</span>
-                  <span className="text-emerald-400 font-bold">{selectedEvent.confidenceScore}%</span>
+                  <span className="text-[#8B949E] block">Detection Confidence:</span>
+                  <span className="text-[#3FB950] font-semibold tabular-nums">{selectedEvent.confidenceScore}%</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 block mb-1">Cryptographic JSON Payload:</span>
-                <pre className="bg-slate-950 p-3 rounded border border-slate-800 text-slate-300 text-[10px] overflow-x-auto leading-relaxed max-h-56">
+                <span className="text-[#8B949E] block mb-1">Cryptographic JSON Payload:</span>
+                <pre className="bg-[#0A0C10] p-3 rounded-[3px] border border-[#252A36] text-[#8B949E] text-[10px] overflow-x-auto leading-relaxed max-h-56">
                   {JSON.stringify(
                     {
                       ...selectedEvent,
@@ -550,18 +550,18 @@ export function AuditView() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+            <div className="flex justify-end gap-2 pt-2 border-t border-[#252A36]">
               <button
                 onClick={() => {
                   copyToClipboard(JSON.stringify(selectedEvent, null, 2), selectedEvent.id);
                 }}
-                className="px-3 py-1.5 rounded bg-slate-850 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs cursor-pointer"
+                className="px-3 py-1.5 rounded-[3px] bg-[#21262D] hover:bg-[#30363D] text-[#C9D1D9] border border-[#30363D] text-xs cursor-pointer transition-colors"
               >
                 Copy JSON
               </button>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs cursor-pointer"
+                className="px-3 py-1.5 rounded-[3px] bg-[#238636] hover:bg-[#2EA043] text-white font-medium text-xs cursor-pointer transition-colors border border-[#2EA043]/50"
               >
                 Done
               </button>
