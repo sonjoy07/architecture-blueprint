@@ -71,6 +71,12 @@ export const CORPORATE_PERSONAS = {
   },
 };
 
+export const AVAILABLE_PERSONAS = [
+  { id: 'sonjoy' as const, user: CORPORATE_PERSONAS.sonjoy, description: 'Infra & Org Admin' },
+  { id: 'sarah' as const, user: CORPORATE_PERSONAS.sarah, description: 'Compliance Officer' },
+  { id: 'alex' as const, user: CORPORATE_PERSONAS.alex, description: 'External Consultant' },
+];
+
 export const ROLE_DEFINITIONS: Record<
   UserRole,
   { label: string; description: string; permissions: Permission[] }
