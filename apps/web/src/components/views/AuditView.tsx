@@ -282,7 +282,7 @@ export function AuditView() {
   }
 
   return (
-    <div className="flex-1 bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 space-y-4 font-mono text-xs select-none">
+    <div className="flex-1 overflow-y-auto bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 space-y-4 font-mono text-xs select-none">
       {/* Top Banner & Telemetry Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0]">
         <div>

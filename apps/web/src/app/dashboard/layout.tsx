@@ -59,9 +59,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       : 'bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]';
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans select-none leading-tight">
+    <div className="h-screen max-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans select-none leading-tight overflow-hidden">
       {/* Top Global Telemetry Strip */}
-      <div className="h-7 bg-[#FFFFFF] border-b border-[#E2E8F0] px-4 flex items-center justify-between text-[11px] font-mono text-[#64748B]">
+      <div className="h-7 bg-[#FFFFFF] border-b border-[#E2E8F0] px-4 flex items-center justify-between text-[11px] font-mono text-[#64748B] shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-[#15803D] font-medium">
             <span className="w-1.5 h-1.5 rounded-[1px] bg-[#16A34A]" />
@@ -103,7 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <CommandPalette />
 
       {/* Main Workspace Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left Fixed Navigation Sidebar */}
         <aside className="w-60 bg-[#FFFFFF] border-r border-[#E2E8F0] flex flex-col justify-between shrink-0 font-mono text-[12px]">
           {/* Top Brand & Nav Section */}
@@ -279,7 +279,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         {/* Main Content Pane */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+        <main className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC] min-h-0 h-full">
           {children}
         </main>
       </div>

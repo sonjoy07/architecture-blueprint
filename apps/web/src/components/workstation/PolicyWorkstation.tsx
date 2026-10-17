@@ -316,6 +316,10 @@ export function PolicyWorkstation() {
   const terminalFeedEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    terminalFeedEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [investigations]);
+
+  useEffect(() => {
     setSelectedPolicy(null);
     if (activePolicies[0]?.defaultChunk) {
       setPinnedCitation(activePolicies[0].defaultChunk);
@@ -635,15 +639,15 @@ export function PolicyWorkstation() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-1.75rem)] bg-[#F8FAFC] text-[#0F172A] select-none overflow-hidden font-mono text-[12px] leading-tight">
+    <div className="flex-1 flex flex-col h-full min-h-0 bg-[#F8FAFC] text-[#0F172A] select-none overflow-hidden font-mono text-[12px] leading-tight">
       {/* 3-Column Workstation Container */}
-      <div className="flex-1 grid grid-cols-12 divide-x divide-[#E2E8F0] h-full overflow-hidden">
+      <div className="flex-1 grid grid-cols-12 divide-x divide-[#E2E8F0] h-full min-h-0 overflow-hidden">
         {/* ========================================================= */}
         {/* LEFT COLUMN (25% - 3 cols): ACTIVE POLICY INDEX */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full min-h-0 overflow-hidden">
           {/* Column Header */}
-          <div className="p-2.5 border-b border-[#E2E8F0] bg-[#FFFFFF] flex items-center justify-between">
+          <div className="p-2.5 border-b border-[#E2E8F0] bg-[#FFFFFF] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <BookOpen className="w-3.5 h-3.5 text-[#2563EB]" />
               <span className="font-semibold text-[#0F172A] text-[11px] uppercase tracking-wider">
@@ -656,7 +660,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Search Bar */}
-          <div className="p-2 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+          <div className="p-2 border-b border-[#E2E8F0] bg-[#F8FAFC] shrink-0">
             <div className="relative">
               <Search className="w-3 h-3 text-[#94A3B8] absolute left-2.5 top-2.5" />
               <input
@@ -681,7 +685,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Policy List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-[#E2E8F0] p-1 bg-[#FFFFFF]">
+          <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-[#E2E8F0] p-1 bg-[#FFFFFF]">
             {filteredPolicies.map((pol) => {
               const isSelected = selectedPolicy?.id === pol.id;
               return (
@@ -722,7 +726,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Left Footer Shard Status */}
-          <div className="p-2 border-t border-[#E2E8F0] bg-[#FFFFFF] text-[10px] text-[#64748B] flex items-center justify-between">
+          <div className="p-2 border-t border-[#E2E8F0] bg-[#FFFFFF] text-[10px] text-[#64748B] flex items-center justify-between shrink-0">
             <span className="flex items-center gap-1.5 text-[#15803D] font-medium">
               <Lock className="w-2.5 h-2.5 text-[#16A34A]" />
               <span>RLS VERIFIED</span>
@@ -734,9 +738,9 @@ export function PolicyWorkstation() {
         {/* ========================================================= */}
         {/* CENTER COLUMN (50% - 6 cols): STRUCTURED INVESTIGATION TERMINAL */}
         {/* ========================================================= */}
-        <div className="col-span-6 flex flex-col bg-[#F8FAFC] h-full overflow-hidden">
+        <div className="col-span-6 flex flex-col bg-[#F8FAFC] h-full min-h-0 overflow-hidden">
           {/* Telemetry Header */}
-          <div className="h-9 border-b border-[#E2E8F0] bg-[#FFFFFF] px-3.5 flex items-center justify-between text-[11px]">
+          <div className="h-9 border-b border-[#E2E8F0] bg-[#FFFFFF] px-3.5 flex items-center justify-between text-[11px] shrink-0">
             <div className="flex items-center gap-2.5">
               <Terminal className="w-3.5 h-3.5 text-[#2563EB]" />
               <span className="font-semibold uppercase tracking-wider text-[#0F172A]">
@@ -755,7 +759,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Investigation Output Feed */}
-          <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 scroll-smooth bg-[#F8FAFC]">
+          <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3.5 scroll-smooth bg-[#F8FAFC]">
             {investigations.map((inv) => (
               <div
                 key={inv.id}
@@ -964,7 +968,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Quick Query Selector Chips */}
-          <div className="px-3 py-1.5 border-t border-[#E2E8F0] bg-[#F8FAFC] flex flex-wrap gap-1.5 text-[11px]">
+          <div className="px-3 py-1.5 border-t border-[#E2E8F0] bg-[#F8FAFC] flex flex-wrap gap-1.5 text-[11px] shrink-0">
             <span className="text-[10px] text-[#64748B] self-center font-mono uppercase mr-1">
               Inquiries:
             </span>
@@ -992,7 +996,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Prompt Terminal Input */}
-          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF]">
+          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF] shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -1033,9 +1037,9 @@ export function PolicyWorkstation() {
         {/* ========================================================= */}
         {/* RIGHT COLUMN (25% - 3 cols): MULTI-MODE INSPECTOR */}
         {/* ========================================================= */}
-        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full overflow-hidden">
+        <div className="col-span-3 flex flex-col bg-[#FFFFFF] h-full min-h-0 overflow-hidden">
           {/* Header & Tabs */}
-          <div className="border-b border-[#E2E8F0] bg-[#FFFFFF]">
+          <div className="border-b border-[#E2E8F0] bg-[#FFFFFF] shrink-0">
             <div className="p-2.5 flex items-center justify-between border-b border-[#E2E8F0]">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#15803D]" />
@@ -1087,7 +1091,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Inspector Content by Tab */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
             {inspectorTab === 'PASSAGE' && (
               <>
                 {/* Document Title & Section */}
@@ -1297,7 +1301,7 @@ export function PolicyWorkstation() {
           </div>
 
           {/* Action Footer */}
-          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF] flex items-center gap-1.5">
+          <div className="p-2.5 border-t border-[#E2E8F0] bg-[#FFFFFF] flex items-center gap-1.5 shrink-0">
             <button
               onClick={copyChunk}
               className="flex-1 py-1 px-2 rounded-[3px] bg-[#F1F5F9] hover:bg-[#E2E8F0] border border-[#CBD5E1] text-[#0F172A] text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
